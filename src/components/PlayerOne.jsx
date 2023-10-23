@@ -5,18 +5,23 @@ const PlayerOne = () => {
         <Wrapper>
             <StyledInput
                 type="text"
+                id="player_1_input_1"
             />
             <StyledInput
                 type="text"
+                id="player_1_input_2"
             />
             <StyledInput
                 type="text"
+                id="player_1_input_3"
             />
             <StyledInput
                 type="text"
+                id="player_1_input_4"
             />
             <StyledInput
                 type="text"
+                id="player_1_input_5"
             />
         </Wrapper>
     )
