@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setPlayerInputToTarget } from "../redux/features/game/gameSlice";
+import { setPlayerInputToTarget, addWordToUsedWord } from "../redux/features/game/gameSlice";
 import styled from "styled-components";
+import XarrowInstance from "./XarrowInstance";
+import UsedWordsTracker from "./usedWords/UsedWordsTracker";
 
 const InputTarget = ({ id, inputNumber }) => {
     const dispatch = useDispatch();
@@ -22,16 +25,37 @@ const InputTarget = ({ id, inputNumber }) => {
 }
 
 const PlayerTwo = () => {
-    const playerTwoHP = useSelector(state => state.gameState.playerOne.hitPoints);
+    const playerTwo = useSelector(state => state.gameState.playerTwo);
+    const dispatch = useDispatch();
+    
+    
+    const [arrows, setArrows] = useState([]);
+
+    const addArrowInstance = (attacker_input_id) => {
+        const attacked_input_id = playerTwo.inputTargets[`input_${attacker_input_id}`];
+        const arrowKey = `player_2_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
+        
+        if (!arrows.find(arrow => arrow.key === arrowKey)) {
+            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`player_2_word_attack_input_${attacker_input_id}`}  elementEndId={`player_1_word_attack_input_${attacked_input_id}`} />])
+        }
+    }
     
     return (
         <Wrapper>
-            <p>HP: {playerTwoHP}</p>
+            <UsedWordsTracker playerObj={playerTwo} />
+
+            <p>HP: {playerTwo.hitPoints}</p>
             
             <InputWrapper>
                 <StyledInput
                     type="text"
-                    id="player_2_input_1"
+                    id="player_2_word_attack_input_1"
+                    onKeyDown={e => {
+                        if (e.code === "Enter") {
+                            addArrowInstance("1");
+                            dispatch(addWordToUsedWord({player: "playerTwo", word: e.target.value}));
+                        }
+                    }}
                 />
 
                 <InputTarget id={"player_2_target_input_1"} inputNumber={1} />
@@ -40,7 +64,10 @@ const PlayerTwo = () => {
             <InputWrapper>
                 <StyledInput
                     type="text"
-                    id="player_2_input_2"
+                    id="player_2_word_attack_input_2"
+                    onKeyDown={e => {
+                        if (e.code === "Enter") addArrowInstance("2");
+                    }}
                 />
 
                 <InputTarget id={"player_2_target_input_2"} inputNumber={2} />
@@ -49,7 +76,10 @@ const PlayerTwo = () => {
             <InputWrapper>
                 <StyledInput
                     type="text"
-                    id="player_2_input_3"
+                    id="player_2_word_attack_input_3"
+                    onKeyDown={e => {
+                        if (e.code === "Enter") addArrowInstance("3");
+                    }}
                 />
 
                 <InputTarget id={"player_2_target_input_3"} inputNumber={3} />
@@ -58,7 +88,10 @@ const PlayerTwo = () => {
             <InputWrapper>
                 <StyledInput
                     type="text"
-                    id="player_2_input_4"
+                    id="player_2_word_attack_input_4"
+                    onKeyDown={e => {
+                        if (e.code === "Enter") addArrowInstance("4");
+                    }}
                 />
 
                 <InputTarget id={"player_2_target_input_4"} inputNumber={4} />
@@ -67,11 +100,18 @@ const PlayerTwo = () => {
             <InputWrapper>
                 <StyledInput
                     type="text"
-                    id="player_2_input_5"
+                    id="player_2_word_attack_input_5"
+                    onKeyDown={e => {
+                        if (e.code === "Enter") addArrowInstance("5");
+                    }}
                 />
 
                 <InputTarget id={"player_2_target_input_5"} inputNumber={5} />
             </InputWrapper>
+
+            {
+                arrows.map(arrowComponent => arrowComponent)
+            }
         </Wrapper>
     )
 }

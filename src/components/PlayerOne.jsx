@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setPlayerInputToTarget } from "../redux/features/game/gameSlice";
+import { setPlayerInputToTarget, addWordToUsedWord } from "../redux/features/game/gameSlice";
 import styled from "styled-components";
-import Xarrow from 'react-xarrows'
+import XarrowInstance from "./XarrowInstance";
+import UsedWordsTracker from "./usedWords/UsedWordsTracker";
 
 const InputTarget = ({ id, inputNumber }) => {
     const dispatch = useDispatch();
@@ -23,61 +25,95 @@ const InputTarget = ({ id, inputNumber }) => {
 }
 
 const PlayerOne = () => {
-    const playerOneHP = useSelector(state => state.gameState.playerOne.hitPoints);
-    const theState = useSelector(state => state.gameState)
+    const playerOne = useSelector(state => state.gameState.playerOne);
+    const dispatch = useDispatch();
     
+    const [arrows, setArrows] = useState([]);
+
+    const addArrowInstance = (attacker_input_id) => {
+        const attacked_input_id = playerOne.inputTargets[`input_${attacker_input_id}`];
+        const arrowKey = `player_1_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
+        
+        if (!arrows.find(arrow => arrow.key === arrowKey)) {
+            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`player_1_word_attack_input_${attacker_input_id}`}  elementEndId={`player_2_word_attack_input_${attacked_input_id}`} />])
+        }
+    }
+
     return (
-        <Wrapper>
-            <p>HP: {playerOneHP}</p>
-            
-            <InputWrapper>
-                <InputTarget id={"player_1_target_input_1"} inputNumber={1}/>
+        <>
+            <Wrapper>
+                <UsedWordsTracker playerObj={playerOne} />
 
-                <StyledInput
-                    type="text"
-                    id="player_1_word_attack_input_1"
-                    onKeyDown={e => {
-                        if (e.code === "Enter") console.log(theState)
-                    }}
-                />
-            </InputWrapper>
+                <p>HP: {playerOne.hitPoints}</p>
+                
+                <InputWrapper>
+                    <InputTarget id={"player_1_target_input_1"} inputNumber={1}/>
 
-            <InputWrapper>
-                <InputTarget id={"player_1_target_input_2"} inputNumber={2}/>
+                    <StyledInput
+                        type="text"
+                        id="player_1_word_attack_input_1"
+                        onKeyDown={e => {
+                            if (e.code === "Enter") {
+                                addArrowInstance("1");
+                                dispatch(addWordToUsedWord({player: "playerOne", word: e.target.value})); // should we check if the word exists before or after dispatch
+                            }
+                        }}
+                    />
+                </InputWrapper>
 
-                <StyledInput
-                    type="text"
-                    id="player_1_word_attack_input_2"
-                />
-            </InputWrapper>
+                <InputWrapper>
+                    <InputTarget id={"player_1_target_input_2"} inputNumber={2}/>
 
-            <InputWrapper>
-                <InputTarget id={"player_1_target_input_3"} inputNumber={3}/>
+                    <StyledInput
+                        type="text"
+                        id="player_1_word_attack_input_2"
+                        onKeyDown={e => {
+                            if (e.code === "Enter") addArrowInstance("2");
+                        }}
+                    />
+                </InputWrapper>
 
-                <StyledInput
-                    type="text"
-                    id="player_1_word_attack_input_3"
-                />
-            </InputWrapper>
+                <InputWrapper>
+                    <InputTarget id={"player_1_target_input_3"} inputNumber={3}/>
 
-            <InputWrapper>
-                <InputTarget id={"player_1_target_input_4"} inputNumber={4}/>
+                    <StyledInput
+                        type="text"
+                        id="player_1_word_attack_input_3"
+                        onKeyDown={e => {
+                            if (e.code === "Enter") addArrowInstance("3");
+                        }}
+                    />
+                </InputWrapper>
 
-                <StyledInput
-                    type="text"
-                    id="player_1_word_attack_input_4"
-                />
-            </InputWrapper>
+                <InputWrapper>
+                    <InputTarget id={"player_1_target_input_4"} inputNumber={4}/>
 
-            <InputWrapper>
-                <InputTarget id={"player_1_target_input_5"} inputNumber={5}/>
+                    <StyledInput
+                        type="text"
+                        id="player_1_word_attack_input_4"
+                        onKeyDown={e => {
+                            if (e.code === "Enter") addArrowInstance("4");
+                        }}
+                    />
+                </InputWrapper>
 
-                <StyledInput
-                    type="text"
-                    id="player_1_word_attack_input_5"
-                />
-            </InputWrapper>
-        </Wrapper>
+                <InputWrapper>
+                    <InputTarget id={"player_1_target_input_5"} inputNumber={5}/>
+
+                    <StyledInput
+                        type="text"
+                        id="player_1_word_attack_input_5"
+                        onKeyDown={e => {
+                            if (e.code === "Enter") addArrowInstance("5");
+                        }}
+                    />
+                </InputWrapper>
+
+                {
+                    arrows.map(arrowComponent => arrowComponent)
+                }
+            </Wrapper>
+        </>
     )
 }
 
