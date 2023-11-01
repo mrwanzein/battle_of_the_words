@@ -4,6 +4,7 @@ import { setPlayerInputToTarget, addWordToUsedWord } from "../redux/features/gam
 import styled from "styled-components";
 import XarrowInstance from "./XarrowInstance";
 import UsedWordsTracker from "./usedWords/UsedWordsTracker";
+import WordExistsError from "./errors/wordExistsError";
 
 const InputTarget = ({ id, inputNumber }) => {
     const dispatch = useDispatch();
@@ -26,15 +27,30 @@ const InputTarget = ({ id, inputNumber }) => {
 
 const PlayerOne = () => {
     const playerOne = useSelector(state => state.gameState.playerOne);
+    const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
     const dispatch = useDispatch();
     
     const [arrows, setArrows] = useState([]);
+    const [errorStates, setErrorStates] = useState({
+        input1: {},
+        input2: {},
+        input3: {},
+        input4: {},
+        input5: {},
+    });
 
-    const addArrowInstance = (attacker_input_id) => {
+    const addArrowInstance = (attacker_input_id, word) => {
         const attacked_input_id = playerOne.inputTargets[`input_${attacker_input_id}`];
         const arrowKey = `player_1_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
+        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) && playerOne.usedWords.hasOwnProperty(word);
+
+        if (wordAlreadyExists) {
+            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": true}}));
+        } else {
+            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": false}}))
+        }
         
-        if (!arrows.find(arrow => arrow.key === arrowKey)) {
+        if (!arrows.find(arrow => arrow.key === arrowKey) && !wordAlreadyExists) {
             setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`player_1_word_attack_input_${attacker_input_id}`}  elementEndId={`player_2_word_attack_input_${attacked_input_id}`} />])
         }
     }
@@ -46,68 +62,120 @@ const PlayerOne = () => {
 
                 <p>HP: {playerOne.hitPoints}</p>
                 
-                <InputWrapper>
-                    <InputTarget id={"player_1_target_input_1"} inputNumber={1}/>
+                <div>
+                    {
+                        errorStates.input1.word_exists ? <WordExistsError /> : null
+                    }
 
-                    <StyledInput
-                        type="text"
-                        id="player_1_word_attack_input_1"
-                        onKeyDown={e => {
-                            if (e.code === "Enter") {
-                                addArrowInstance("1");
-                                dispatch(addWordToUsedWord({player: "playerOne", word: e.target.value})); // should we check if the word exists before or after dispatch
-                            }
-                        }}
-                    />
-                </InputWrapper>
+                    <InputWrapper>
+                        <InputTarget id={"player_1_target_input_1"} inputNumber={1}/>
 
-                <InputWrapper>
-                    <InputTarget id={"player_1_target_input_2"} inputNumber={2}/>
+                        <StyledInput
+                            type="text"
+                            id="player_1_word_attack_input_1"
+                            onKeyDown={e => {
+                                if (e.code === "Enter") {
+                                    const inputtedWord = e.target.value;
 
-                    <StyledInput
-                        type="text"
-                        id="player_1_word_attack_input_2"
-                        onKeyDown={e => {
-                            if (e.code === "Enter") addArrowInstance("2");
-                        }}
-                    />
-                </InputWrapper>
+                                    addArrowInstance("1", inputtedWord);
+                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord})); // should we check if the word exists before or after dispatch
+                                }
+                            }}
+                        />
+                    </InputWrapper>
+                </div>
 
-                <InputWrapper>
-                    <InputTarget id={"player_1_target_input_3"} inputNumber={3}/>
+                <div>
+                    {
+                        errorStates.input2.word_exists ? <WordExistsError /> : null
+                    }
 
-                    <StyledInput
-                        type="text"
-                        id="player_1_word_attack_input_3"
-                        onKeyDown={e => {
-                            if (e.code === "Enter") addArrowInstance("3");
-                        }}
-                    />
-                </InputWrapper>
+                    <InputWrapper>
+                        <InputTarget id={"player_1_target_input_2"} inputNumber={2}/>
 
-                <InputWrapper>
-                    <InputTarget id={"player_1_target_input_4"} inputNumber={4}/>
+                        <StyledInput
+                            type="text"
+                            id="player_1_word_attack_input_2"
+                            onKeyDown={e => {
+                                if (e.code === "Enter") {
+                                    const inputtedWord = e.target.value;
 
-                    <StyledInput
-                        type="text"
-                        id="player_1_word_attack_input_4"
-                        onKeyDown={e => {
-                            if (e.code === "Enter") addArrowInstance("4");
-                        }}
-                    />
-                </InputWrapper>
+                                    addArrowInstance("2", inputtedWord);
+                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                }
+                            }}
+                        />
+                    </InputWrapper>
+                </div>
 
-                <InputWrapper>
-                    <InputTarget id={"player_1_target_input_5"} inputNumber={5}/>
+                <div>
+                    {
+                        errorStates.input3.word_exists ? <WordExistsError /> : null
+                    }
+                    
+                    <InputWrapper>
+                        <InputTarget id={"player_1_target_input_3"} inputNumber={3}/>
 
-                    <StyledInput
-                        type="text"
-                        id="player_1_word_attack_input_5"
-                        onKeyDown={e => {
-                            if (e.code === "Enter") addArrowInstance("5");
-                        }}
-                    />
-                </InputWrapper>
+                        <StyledInput
+                            type="text"
+                            id="player_1_word_attack_input_3"
+                            onKeyDown={e => {
+                                if (e.code === "Enter") {
+                                    const inputtedWord = e.target.value;
+
+                                    addArrowInstance("3", inputtedWord);
+                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                }
+                            }}
+                        />
+                    </InputWrapper>
+                </div>
+
+                <div>
+                    {
+                        errorStates.input4.word_exists ? <WordExistsError /> : null
+                    }
+
+                    <InputWrapper>
+                        <InputTarget id={"player_1_target_input_4"} inputNumber={4}/>
+
+                        <StyledInput
+                            type="text"
+                            id="player_1_word_attack_input_4"
+                            onKeyDown={e => {
+                                if (e.code === "Enter") {
+                                    const inputtedWord = e.target.value;
+
+                                    addArrowInstance("4", inputtedWord);
+                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                }
+                            }}
+                        />
+                    </InputWrapper>
+                </div>
+
+                <div>
+                    {
+                        errorStates.input5.word_exists ? <WordExistsError /> : null
+                    }
+
+                    <InputWrapper>
+                        <InputTarget id={"player_1_target_input_5"} inputNumber={5}/>
+
+                        <StyledInput
+                            type="text"
+                            id="player_1_word_attack_input_5"
+                            onKeyDown={e => {
+                                if (e.code === "Enter") {
+                                    const inputtedWord = e.target.value;
+
+                                    addArrowInstance("5", inputtedWord);
+                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                }
+                            }}
+                        />
+                    </InputWrapper>
+                </div>
 
                 {
                     arrows.map(arrowComponent => arrowComponent)
