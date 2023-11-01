@@ -44,7 +44,7 @@ const PlayerOne = () => {
     const addArrowInstance = (attacker_input_id, word) => {
         const attacked_input_id = playerOne.inputTargets[`input_${attacker_input_id}`];
         const arrowKey = `player_1_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
-        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) && playerOne.usedWords.hasOwnProperty(word);
+        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerOne.usedWords.hasOwnProperty(word);
 
         if (wordAlreadyExists) {
             setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": true}}));
