@@ -1,13 +1,16 @@
 import styled from 'styled-components'
 import PlayerOne from "./PlayerOne"
 import PlayerTwo from "./PlayerTwo"
+import { Xwrapper } from 'react-xarrows'
 
 const PlayArea = () => {
     return (
-        <Wrapper>
-            <PlayerOne />
-            <PlayerTwo />
-        </Wrapper>
+        <Xwrapper>
+            <Wrapper>
+                <PlayerOne />
+                <PlayerTwo />
+            </Wrapper>
+        </Xwrapper>
     )
 }
 

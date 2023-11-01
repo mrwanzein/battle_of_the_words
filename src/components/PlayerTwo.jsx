@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useXarrow } from "react-xarrows";
 import { useSelector, useDispatch } from "react-redux";
 import { setPlayerInputToTarget, addWordToUsedWord } from "../redux/features/game/gameSlice";
 import styled from "styled-components";
@@ -28,6 +29,7 @@ const InputTarget = ({ id, inputNumber }) => {
 const PlayerTwo = () => {
     const playerTwo = useSelector(state => state.gameState.playerTwo);
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
+    useXarrow();
     const dispatch = useDispatch();
     
     
