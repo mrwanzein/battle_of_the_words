@@ -40,18 +40,20 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
     });
 
     const addArrowInstance = (attacker_input_id, word) => {
-        const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
-        const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
-        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
-
-        if (wordAlreadyExists) {
-            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": true}}));
-        } else {
-            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": false}}))
-        }
-        
-        if (!arrows.find(arrow => arrow.key === arrowKey) && !wordAlreadyExists) {
-            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />])
+        if (word !== "") {
+            const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
+            const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
+            const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
+    
+            if (wordAlreadyExists) {
+                setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": true}}));
+            } else {
+                setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": false}}))
+            }
+            
+            if (!arrows.find(arrow => arrow.key === arrowKey) && !wordAlreadyExists) {
+                setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />])
+            }
         }
     }
 
