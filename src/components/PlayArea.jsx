@@ -1,14 +1,26 @@
+import { useSelector } from 'react-redux'
+import Player from './Player'
 import styled from 'styled-components'
-import PlayerOne from "./PlayerOne"
-import PlayerTwo from "./PlayerTwo"
 import { Xwrapper } from 'react-xarrows'
 
 const PlayArea = () => {
+    const PlayerOne = useSelector(state => state.gameState.playerOne);
+    const PlayerTwo = useSelector(state => state.gameState.playerTwo);
+    const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
+    
     return (
         <Xwrapper>
             <Wrapper>
-                <PlayerOne />
-                <PlayerTwo />
+                <Player 
+                    playerObj={PlayerOne}
+                    playerRole={"playerOne"}
+                    usedWordsForBothPlayers={usedWordsForBothPlayers}
+                />
+                <Player 
+                    playerObj={PlayerTwo}
+                    playerRole={"playerTwo"}
+                    usedWordsForBothPlayers={usedWordsForBothPlayers}
+                />
             </Wrapper>
         </Xwrapper>
     )

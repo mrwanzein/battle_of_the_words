@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { useXarrow } from "react-xarrows";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setPlayerInputToTarget, addWordToUsedWord } from "../redux/features/game/gameSlice";
 import styled from "styled-components";
 import XarrowInstance from "./XarrowInstance";
 import UsedWordsTracker from "./usedWords/UsedWordsTracker";
 import WordExistsError from "./errors/wordExistsError";
 
-const InputTarget = ({ id, inputNumber }) => {
+const InputTarget = ({ id, inputNumber, playerRole }) => {
     const dispatch = useDispatch();
     
     return (
         <select
             id={id}
             onChange={e => {
-                dispatch(setPlayerInputToTarget({player: "playerOne", selectedInput: inputNumber, target: e.target.value}))
+                dispatch(setPlayerInputToTarget({player: playerRole, selectedInput: inputNumber, target: e.target.value}))
             }}
         >
             <option value="1">1</option>
@@ -26,9 +26,7 @@ const InputTarget = ({ id, inputNumber }) => {
     )
 }
 
-const PlayerOne = () => {
-    const playerOne = useSelector(state => state.gameState.playerOne);
-    const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
+const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
     useXarrow();
     const dispatch = useDispatch();
     
@@ -42,9 +40,9 @@ const PlayerOne = () => {
     });
 
     const addArrowInstance = (attacker_input_id, word) => {
-        const attacked_input_id = playerOne.inputTargets[`input_${attacker_input_id}`];
-        const arrowKey = `player_1_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
-        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerOne.usedWords.hasOwnProperty(word);
+        const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
+        const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
+        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
 
         if (wordAlreadyExists) {
             setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": true}}));
@@ -53,16 +51,16 @@ const PlayerOne = () => {
         }
         
         if (!arrows.find(arrow => arrow.key === arrowKey) && !wordAlreadyExists) {
-            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`player_1_word_attack_input_${attacker_input_id}`}  elementEndId={`player_2_word_attack_input_${attacked_input_id}`} />])
+            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />])
         }
     }
 
     return (
         <>
             <Wrapper>
-                <UsedWordsTracker playerObj={playerOne} />
+                <UsedWordsTracker playerObj={playerObj} />
 
-                <p>HP: {playerOne.hitPoints}</p>
+                <p>HP: {playerObj.hitPoints}</p>
                 
                 <div>
                     {
@@ -70,20 +68,26 @@ const PlayerOne = () => {
                     }
 
                     <InputWrapper>
-                        <InputTarget id={"player_1_target_input_1"} inputNumber={1}/>
+                        {
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
 
                         <StyledInput
                             type="text"
-                            id="player_1_word_attack_input_1"
+                            id={`${playerRole}_word_attack_input_1`}
                             onKeyDown={e => {
                                 if (e.code === "Enter") {
                                     const inputtedWord = e.target.value;
 
                                     addArrowInstance("1", inputtedWord);
-                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord})); // should we check if the word exists before or after dispatch
+                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord})); // should we check if the word exists before or after dispatch
                                 }
                             }}
                         />
+
+                        {
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
                     </InputWrapper>
                 </div>
 
@@ -93,20 +97,26 @@ const PlayerOne = () => {
                     }
 
                     <InputWrapper>
-                        <InputTarget id={"player_1_target_input_2"} inputNumber={2}/>
+                        {
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
 
                         <StyledInput
                             type="text"
-                            id="player_1_word_attack_input_2"
+                            id={`${playerRole}_word_attack_input_2`}
                             onKeyDown={e => {
                                 if (e.code === "Enter") {
                                     const inputtedWord = e.target.value;
 
                                     addArrowInstance("2", inputtedWord);
-                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                 }
                             }}
                         />
+
+                        {
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
                     </InputWrapper>
                 </div>
 
@@ -116,20 +126,26 @@ const PlayerOne = () => {
                     }
                     
                     <InputWrapper>
-                        <InputTarget id={"player_1_target_input_3"} inputNumber={3}/>
+                        {
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
 
                         <StyledInput
                             type="text"
-                            id="player_1_word_attack_input_3"
+                            id={`${playerRole}_word_attack_input_3`}
                             onKeyDown={e => {
                                 if (e.code === "Enter") {
                                     const inputtedWord = e.target.value;
 
                                     addArrowInstance("3", inputtedWord);
-                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                 }
                             }}
                         />
+
+                        {
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
                     </InputWrapper>
                 </div>
 
@@ -139,20 +155,26 @@ const PlayerOne = () => {
                     }
 
                     <InputWrapper>
-                        <InputTarget id={"player_1_target_input_4"} inputNumber={4}/>
+                        {
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
 
                         <StyledInput
                             type="text"
-                            id="player_1_word_attack_input_4"
+                            id={`${playerRole}_word_attack_input_4`}
                             onKeyDown={e => {
                                 if (e.code === "Enter") {
                                     const inputtedWord = e.target.value;
 
                                     addArrowInstance("4", inputtedWord);
-                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                 }
                             }}
                         />
+
+                        {
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
                     </InputWrapper>
                 </div>
 
@@ -162,20 +184,26 @@ const PlayerOne = () => {
                     }
 
                     <InputWrapper>
-                        <InputTarget id={"player_1_target_input_5"} inputNumber={5}/>
+                        {
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
 
                         <StyledInput
                             type="text"
-                            id="player_1_word_attack_input_5"
+                            id={`${playerRole}_word_attack_input_5`}
                             onKeyDown={e => {
                                 if (e.code === "Enter") {
                                     const inputtedWord = e.target.value;
 
                                     addArrowInstance("5", inputtedWord);
-                                    dispatch(addWordToUsedWord({player: "playerOne", word: inputtedWord}));
+                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                 }
                             }}
                         />
+
+                        {
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                        }
                     </InputWrapper>
                 </div>
 
@@ -187,7 +215,7 @@ const PlayerOne = () => {
     )
 }
 
-export default PlayerOne;
+export default Player;
 
 const Wrapper = styled.div`
     display: flex;
