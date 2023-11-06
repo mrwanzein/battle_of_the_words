@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addWordToUsedWord } from "../redux/features/game/gameSlice";
+import { useXarrow } from "react-xarrows";
 import WordInputErrors from "./errors/WordInputErrors";
 import PlayerTargetInput from "./PlayerTargetInput";
 import XarrowInstance from "./XarrowInstance";
@@ -16,6 +17,8 @@ const PlayerInput = ({
 }) => {
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
     const dispatch = useDispatch();
+
+    useXarrow();
 
     const [inputError, setInputError] = useState(false);
 

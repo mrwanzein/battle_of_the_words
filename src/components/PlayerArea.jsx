@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { useXarrow } from "react-xarrows";
 import styled from "styled-components";
 import UsedWordsTracker from "./usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 
 const PlayerArea = ({ playerObj, playerRole }) => {
-    useXarrow();
-    
     const [arrows, setArrows] = useState([]);
 
     return (
