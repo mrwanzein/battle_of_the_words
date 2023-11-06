@@ -4,7 +4,7 @@ import styled from "styled-components";
 import UsedWordsTracker from "./usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 
-const Player = ({ playerObj, playerRole }) => {
+const PlayerArea = ({ playerObj, playerRole }) => {
     useXarrow();
     
     const [arrows, setArrows] = useState([]);
@@ -37,7 +37,7 @@ const Player = ({ playerObj, playerRole }) => {
     )
 }
 
-export default Player;
+export default PlayerArea;
 
 const Wrapper = styled.div`
     display: flex;

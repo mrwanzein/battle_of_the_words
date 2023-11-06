@@ -1,19 +1,19 @@
 import styled from "styled-components";
-import PlayArea from "./components/PlayArea";
+import Arena from "./components/Arena";
 
 function App() {
   return (
     <>
-      <PlayAreaWrapper>
-        <PlayArea />
-      </PlayAreaWrapper>
+      <ArenaWrapper>
+        <Arena />
+      </ArenaWrapper>
     </>
   )
 }
 
 export default App
 
-const PlayAreaWrapper = styled.div`
+const ArenaWrapper = styled.div`
   height: 100vh;
   display: flex;
   justify-content: center;
