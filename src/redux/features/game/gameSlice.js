@@ -40,7 +40,7 @@ export const gameSlice = createSlice({
         },
         addWordToUsedWord: (state, action) => {
             const {player, word} = action.payload;
-            if (!state.usedWordsForBothPlayer[word] && word !== "") {
+            if (!state.usedWordsForBothPlayer[word]) {
                 state.usedWordsForBothPlayer[word] = true;
                 
                 if (!state[player].usedWords[word]) state[player].usedWords[word] = true;

@@ -5,7 +5,8 @@ import { setPlayerInputToTarget, addWordToUsedWord } from "../redux/features/gam
 import styled from "styled-components";
 import XarrowInstance from "./XarrowInstance";
 import UsedWordsTracker from "./usedWords/UsedWordsTracker";
-import WordExistsError from "./errors/wordExistsError";
+import WordInputErrors from "./errors/WordInputErrors";
+import englishDictionary from "../../english_words_dictionary.json";
 
 const InputTarget = ({ id, inputNumber, playerRole }) => {
     const dispatch = useDispatch();
@@ -32,29 +33,42 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
     
     const [arrows, setArrows] = useState([]);
     const [errorStates, setErrorStates] = useState({
-        input1: {},
-        input2: {},
-        input3: {},
-        input4: {},
-        input5: {},
+        input1: false,
+        input2: false,
+        input3: false,
+        input4: false,
+        input5: false,
     });
 
-    const addArrowInstance = (attacker_input_id, word) => {
-        if (word !== "") {
-            const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
-            const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
-            const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
+    const addArrowInstance = (attacker_input_id) => {
+        const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
+        const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
+        
+        if (!arrows.find(arrow => arrow.key === arrowKey)) setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />])
+    }
     
-            if (wordAlreadyExists) {
-                setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": true}}));
-            } else {
-                setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: {...prev[`input${attacker_input_id}`], "word_exists": false}}))
-            }
-            
-            if (!arrows.find(arrow => arrow.key === arrowKey) && !wordAlreadyExists) {
-                setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />])
-            }
+    const checkInputErrors = (attacker_input_id, word) => {
+        const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
+        const inputAlreadyHaveError = errorStates[`input${attacker_input_id}`];
+        const inEnglishDictionary = englishDictionary[word];
+
+        if (word == "") {
+            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: "input can not be empty"}));
+            return true;
         }
+
+        if (wordAlreadyExists) {
+            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: "this word exists already"}));
+            return true;
+        }
+
+        if (!inEnglishDictionary) {
+            setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: "this is not an English word"}));
+            return true;
+        }
+
+        if (inputAlreadyHaveError) setErrorStates(prev => ({...prev, [`input${attacker_input_id}`]: false}));
+        return false;
     }
 
     return (
@@ -66,7 +80,7 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
                 
                 <div>
                     {
-                        errorStates.input1.word_exists ? <WordExistsError /> : null
+                        errorStates.input1 ? <WordInputErrors errorMsg={errorStates.input1}/> : null
                     }
 
                     <InputWrapper>
@@ -81,8 +95,10 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
                                 if (e.code === "Enter") {
                                     const inputtedWord = e.target.value;
 
-                                    addArrowInstance("1", inputtedWord);
-                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord})); // should we check if the word exists before or after dispatch
+                                    if (!checkInputErrors("1", inputtedWord)) {
+                                        addArrowInstance("1");
+                                        dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+                                    }
                                 }
                             }}
                         />
@@ -95,12 +111,12 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
 
                 <div>
                     {
-                        errorStates.input2.word_exists ? <WordExistsError /> : null
+                        errorStates.input2 ? <WordInputErrors errorMsg={errorStates.input1}/> : null
                     }
 
                     <InputWrapper>
                         {
-                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_2`} inputNumber={1} playerRole={playerRole}/>
                         }
 
                         <StyledInput
@@ -117,19 +133,19 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
                         />
 
                         {
-                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_2`} inputNumber={1} playerRole={playerRole}/>
                         }
                     </InputWrapper>
                 </div>
 
                 <div>
                     {
-                        errorStates.input3.word_exists ? <WordExistsError /> : null
+                        errorStates.input3 ? <WordInputErrors errorMsg={errorStates.input1}/> : null
                     }
                     
                     <InputWrapper>
                         {
-                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_3`} inputNumber={1} playerRole={playerRole}/>
                         }
 
                         <StyledInput
@@ -146,19 +162,19 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
                         />
 
                         {
-                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_3`} inputNumber={1} playerRole={playerRole}/>
                         }
                     </InputWrapper>
                 </div>
 
                 <div>
                     {
-                        errorStates.input4.word_exists ? <WordExistsError /> : null
+                        errorStates.input4 ? <WordInputErrors errorMsg={errorStates.input1}/> : null
                     }
 
                     <InputWrapper>
                         {
-                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_4`} inputNumber={1} playerRole={playerRole}/>
                         }
 
                         <StyledInput
@@ -175,19 +191,19 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
                         />
 
                         {
-                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_4`} inputNumber={1} playerRole={playerRole}/>
                         }
                     </InputWrapper>
                 </div>
 
                 <div>
                     {
-                        errorStates.input5.word_exists ? <WordExistsError /> : null
+                        errorStates.input5 ? <WordInputErrors errorMsg={errorStates.input1}/> : null
                     }
 
                     <InputWrapper>
                         {
-                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerOne" && <InputTarget id={`${playerRole}_target_input_5`} inputNumber={1} playerRole={playerRole}/>
                         }
 
                         <StyledInput
@@ -204,7 +220,7 @@ const Player = ({ playerObj, playerRole, usedWordsForBothPlayers }) => {
                         />
 
                         {
-                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_1`} inputNumber={1} playerRole={playerRole}/>
+                            playerRole === "playerTwo" && <InputTarget id={`${playerRole}_target_input_5`} inputNumber={1} playerRole={playerRole}/>
                         }
                     </InputWrapper>
                 </div>
