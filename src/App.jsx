@@ -1,5 +1,5 @@
-import styled from "styled-components"
-import PlayArea from "./components/PlayArea"
+import styled from "styled-components";
+import PlayArea from "./components/PlayArea";
 
 function App() {
   return (

@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from "styled-components";
 import { UsedWordBadge } from "../shared_styles/sharedStyles";
 
 const UsedWordsTracker = ({ playerObj }) => {

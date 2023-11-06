@@ -1,4 +1,4 @@
-import Xarrow from "react-xarrows"
+import Xarrow from "react-xarrows";
 
 const XarrowInstance = ({ elementStartId, elementEndId }) => {
     return (
