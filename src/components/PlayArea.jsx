@@ -6,7 +6,6 @@ import { Xwrapper } from 'react-xarrows';
 const PlayArea = () => {
     const PlayerOne = useSelector(state => state.gameState.playerOne);
     const PlayerTwo = useSelector(state => state.gameState.playerTwo);
-    const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
     
     return (
         <Xwrapper>
@@ -14,12 +13,10 @@ const PlayArea = () => {
                 <Player 
                     playerObj={PlayerOne}
                     playerRole={"playerOne"}
-                    usedWordsForBothPlayers={usedWordsForBothPlayers}
                 />
                 <Player 
                     playerObj={PlayerTwo}
                     playerRole={"playerTwo"}
-                    usedWordsForBothPlayers={usedWordsForBothPlayers}
                 />
             </Wrapper>
         </Xwrapper>
