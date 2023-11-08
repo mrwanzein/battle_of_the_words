@@ -22,11 +22,16 @@ const PlayerInput = ({
 
     const [inputError, setInputError] = useState(false);
 
-    const addArrowInstance = (attacker_input_id) => {
+    const addArrowInstance = (attacker_input_id, inputtedWord) => {
         const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
         const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
         
-        if (!arrows.find(arrow => arrow.key === arrowKey)) setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />])
+        if (!arrows.find(arrow => arrow.key === arrowKey)) {
+            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />]);
+            dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+        } else {
+            setInputError("this target is already attacked");
+        }
     }
 
     const checkInputErrors = (word) => {
@@ -72,8 +77,7 @@ const PlayerInput = ({
                             const inputtedWord = e.target.value;
 
                             if (!checkInputErrors(inputtedWord)) {
-                                addArrowInstance(inputInstanceNumber);
-                                dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+                                addArrowInstance(inputInstanceNumber, inputtedWord);
                             }
                         }
                     }}
