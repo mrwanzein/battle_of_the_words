@@ -4,22 +4,22 @@ const initialState = {
     playerOne: {
         hitPoints: 1000,
         inputTargets: {
-            "input_1": "1",
-            "input_2": "1",
-            "input_3": "1",
-            "input_4": "1",
-            "input_5": "1"
+            "input_1": {target: "1", active: false},
+            "input_2": {target: "1", active: false},
+            "input_3": {target: "1", active: false},
+            "input_4": {target: "1", active: false},
+            "input_5": {target: "1", active: false}
         },
         usedWords: {}
     },
     playerTwo: {
         hitPoints: 1000,
         inputTargets: {
-            "input_1": "1",
-            "input_2": "1",
-            "input_3": "1",
-            "input_4": "1",
-            "input_5": "1"
+            "input_1": {target: "1", active: false},
+            "input_2": {target: "1", active: false},
+            "input_3": {target: "1", active: false},
+            "input_4": {target: "1", active: false},
+            "input_5": {target: "1", active: false}
         },
         usedWords: {}
     },
@@ -36,15 +36,17 @@ export const gameSlice = createSlice({
         },
         setPlayerInputToTarget: (state, action) => {
             const {player, selectedInput, target} = action.payload;
-            state[player].inputTargets[`input_${selectedInput}`] = target;
+            const playerInput = state[player].inputTargets[`input_${selectedInput}`];
+
+            playerInput.target = target;
         },
         addWordToUsedWord: (state, action) => {
-            const {player, word} = action.payload;
-            if (!state.usedWordsForBothPlayer[word]) {
-                state.usedWordsForBothPlayer[word] = true;
-                
-                if (!state[player].usedWords[word]) state[player].usedWords[word] = true;
-            }
+            const {player, word, attacker_input_id} = action.payload;
+            
+            state.usedWordsForBothPlayer[word] = true;
+            state[player].usedWords[word] = true;
+            state[player].inputTargets[`input_${attacker_input_id}`].active = true;
+
         }
     }
 })

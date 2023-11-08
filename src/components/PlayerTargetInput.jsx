@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { setPlayerInputToTarget } from "../redux/features/game/gameSlice";
 
-const PlayerTargetInput = ({ playerRole, inputNumber }) => {
+const PlayerTargetInput = ({ playerRole, inputNumber, playerObj }) => {
     const dispatch = useDispatch();
     
     return (
@@ -10,6 +10,7 @@ const PlayerTargetInput = ({ playerRole, inputNumber }) => {
             onChange={e => {
                 dispatch(setPlayerInputToTarget({player: playerRole, selectedInput: inputNumber, target: e.target.value}))
             }}
+            disabled={playerObj.inputTargets[`input_${inputNumber}`].active}
         >
             <option value="1">1</option>
             <option value="2">2</option>

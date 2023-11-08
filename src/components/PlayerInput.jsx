@@ -23,12 +23,12 @@ const PlayerInput = ({
     const [inputError, setInputError] = useState(false);
 
     const addArrowInstance = (attacker_input_id, inputtedWord) => {
-        const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`];
+        const attacked_input_id = playerObj.inputTargets[`input_${attacker_input_id}`].target;
         const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
         
         if (!arrows.find(arrow => arrow.key === arrowKey)) {
             setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />]);
-            dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+            dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord, attacker_input_id}));
         } else {
             setInputError("this target is already attacked");
         }
@@ -66,7 +66,12 @@ const PlayerInput = ({
 
             <InputWrapper>
                 {
-                    playerRole === "playerOne" && <PlayerTargetInput inputNumber={inputInstanceNumber} playerRole={playerRole}/>
+                    playerRole === "playerOne" &&
+                    <PlayerTargetInput
+                        inputNumber={inputInstanceNumber}
+                        playerRole={playerRole}
+                        playerObj={playerObj}
+                    />
                 }
 
                 <StyledInput
@@ -84,7 +89,12 @@ const PlayerInput = ({
                 />
 
                 {
-                    playerRole === "playerTwo" && <PlayerTargetInput inputNumber={inputInstanceNumber} playerRole={playerRole}/>
+                    playerRole === "playerTwo" &&
+                    <PlayerTargetInput
+                        inputNumber={inputInstanceNumber}
+                        playerRole={playerRole}
+                        playerObj={playerObj}
+                    />
                 }
             </InputWrapper>
         </>
