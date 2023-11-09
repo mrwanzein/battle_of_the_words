@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addWordToUsedWord } from "../redux/features/game/gameSlice";
+import Xarrow from "react-xarrows"
 import { useXarrow } from "react-xarrows";
 import WordInputErrors from "./errors/WordInputErrors";
 import PlayerTargetInput from "./PlayerTargetInput";
-import XarrowInstance from "./XarrowInstance";
 import englishDictionary from "../../english_words_dictionary.json";
 import styled from "styled-components";
 
 const PlayerInput = ({
-    arrows,
     setArrows,
     playerRole,
     playerObj,
@@ -39,8 +38,15 @@ const PlayerInput = ({
             return;
         }
         
-            setArrows(prev => [...prev, <XarrowInstance key={arrowKey} elementStartId={`${playerRole}_word_attack_input_${attacker_input_id}`}  elementEndId={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`} />]);
-            dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord, attacker_input_id}));
+        setArrows(prev => [
+            ...prev,
+            <Xarrow
+                key={arrowKey}
+                start={`${playerRole}_word_attack_input_${attacker_input_id}`}
+                end={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`}
+            />
+        ]);
+        dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord, attacker_input_id}));
     }
 
     const checkInputErrors = (word) => {
