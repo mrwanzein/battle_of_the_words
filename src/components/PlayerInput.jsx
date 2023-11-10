@@ -44,6 +44,19 @@ const PlayerInput = ({
                 key={arrowKey}
                 start={`${playerRole}_word_attack_input_${attacker_input_id}`}
                 end={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`}
+                labels={
+                    <div
+                        id={`${playerRole}_active_arrow_${inputInstanceNumber}`}
+                        style={{
+                            border: "2px solid lightgrey",
+                            padding: "5px 12px",
+                            background: "#4d4d4d",
+                            color: "white"
+                        }}
+                    >
+                        5
+                    </div>
+                }
             />
         ]);
         dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord, attacker_input_id}));
@@ -98,6 +111,12 @@ const PlayerInput = ({
 
                             if (!checkInputErrors(inputtedWord)) {
                                 addArrowInstance(inputInstanceNumber, inputtedWord);
+                                const arrowTimerId = setInterval(() => {
+                                    const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_${inputInstanceNumber}`);
+                                    
+                                    arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
+                                    if (arrowTimerDiv.innerText <= 0) clearInterval(arrowTimerId);
+                                }, 1000);
                             }
                         }
                     }}
