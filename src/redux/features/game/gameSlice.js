@@ -1,25 +1,34 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialInputObj = {
+    target: "1",
+    active: false,
+    status: "attacking",
+    wordToDefend: null,
+    arrowToDefendId: null,
+    arrowToDefendTimerId: null
+}
+
 const initialState = {
     playerOne: {
         hitPoints: 1000,
         inputTargets: {
-            "input_1": {target: "1", active: false},
-            "input_2": {target: "1", active: false},
-            "input_3": {target: "1", active: false},
-            "input_4": {target: "1", active: false},
-            "input_5": {target: "1", active: false}
+            "input_1": initialInputObj,
+            "input_2": initialInputObj,
+            "input_3": initialInputObj,
+            "input_4": initialInputObj,
+            "input_5": initialInputObj
         },
         usedWords: {}
     },
     playerTwo: {
         hitPoints: 1000,
         inputTargets: {
-            "input_1": {target: "1", active: false},
-            "input_2": {target: "1", active: false},
-            "input_3": {target: "1", active: false},
-            "input_4": {target: "1", active: false},
-            "input_5": {target: "1", active: false}
+            "input_1": initialInputObj,
+            "input_2": initialInputObj,
+            "input_3": initialInputObj,
+            "input_4": initialInputObj,
+            "input_5": initialInputObj
         },
         usedWords: {}
     },
@@ -41,12 +50,34 @@ export const gameSlice = createSlice({
             playerInput.target = target;
         },
         addWordToUsedWord: (state, action) => {
-            const {player, word, attacker_input_id} = action.payload;
+            const {player, word} = action.payload;
             
             state.usedWordsForBothPlayer[word] = true;
             state[player].usedWords[word] = true;
-            state[player].inputTargets[`input_${attacker_input_id}`].active = true;
 
+        },
+        setInputDuel: (state, action) => {
+            const {
+                attacker,
+                word,
+                attacker_input_id,
+                attacked_input_id,
+                attackerArrowId
+            } = action.payload;
+            const oppositePlayer = attacker === "playerOne" ? "playerTwo" : "playerOne";
+            const oppositePlayerInputTargets = state[oppositePlayer].inputTargets[`input_${attacked_input_id}`];
+
+            state[attacker].inputTargets[`input_${attacker_input_id}`].active = true;
+
+            oppositePlayerInputTargets.active = true;
+            oppositePlayerInputTargets.status = "defending";
+            oppositePlayerInputTargets.wordToDefend = word;
+            oppositePlayerInputTargets.arrowToDefendId = attackerArrowId;
+        },
+        setArrowToDefendId: (state, action) => {
+            const {defender, arrowTimerId, attacker_input_id} = action.payload;
+
+            state[defender].inputTargets[`input_${attacker_input_id}`].arrowToDefendTimerId = arrowTimerId;
         }
     }
 })
@@ -54,7 +85,9 @@ export const gameSlice = createSlice({
 export const {
     decrementHitPoints,
     setPlayerInputToTarget,
-    addWordToUsedWord
+    addWordToUsedWord,
+    setInputDuel,
+    setArrowToDefendId
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

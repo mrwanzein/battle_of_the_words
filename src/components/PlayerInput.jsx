@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addWordToUsedWord } from "../redux/features/game/gameSlice";
+import {
+    addWordToUsedWord,
+    setInputDuel,
+    setArrowToDefendId
+} from "../redux/features/game/gameSlice";
 import Xarrow from "react-xarrows"
 import { useXarrow } from "react-xarrows";
 import WordInputErrors from "./errors/WordInputErrors";
@@ -21,51 +25,50 @@ const PlayerInput = ({
 
     const [inputError, setInputError] = useState(false);
 
-    const addArrowInstance = (attacker_input_id, inputtedWord) => {
-        const playerInputTarget = playerObj.inputTargets[`input_${attacker_input_id}`];
-        const attacked_input_id = playerInputTarget.target;
-        const alreadyAttacking = playerInputTarget.active;
-        const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputTargets).find(targetObj => targetObj.target === attacked_input_id && targetObj.active);
-        const arrowKey = `${playerRole}_word_attack_input_${attacker_input_id}_attacking_input_${attacked_input_id}`;
-
-        if (alreadyAttacking) {
-            setInputError("this target is already used");
-            return;
-        }
-
-        if (targetIsAlreadyBeingAttacked) {
-            setInputError("this target is already attacked");
-            return;
-        }
+    const addArrowInstance = (activeInput, inputtedWord) => {
+        const attacked_input_id = activeInput.target;
+        const arrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
         
         setArrows(prev => [
             ...prev,
-            <Xarrow
-                key={arrowKey}
-                start={`${playerRole}_word_attack_input_${attacker_input_id}`}
-                end={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`}
-                labels={
-                    <div
-                        id={`${playerRole}_active_arrow_${inputInstanceNumber}`}
-                        style={{
-                            border: "2px solid lightgrey",
-                            padding: "5px 12px",
-                            background: "#4d4d4d",
-                            color: "white"
-                        }}
-                    >
-                        5
-                    </div>
-                }
-            />
+            <div id={arrowKey} key={arrowKey}>
+                <Xarrow
+                    start={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
+                    end={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`}
+                    labels={
+                        <div
+                            id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
+                            style={{
+                                border: "2px solid lightgrey",
+                                padding: "5px 12px",
+                                background: "#4d4d4d",
+                                color: "white"
+                            }}
+                        >
+                            5
+                        </div>
+                    }
+                    animateDrawing={0.3}
+                />
+            </div>
         ]);
-        dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord, attacker_input_id}));
+
+        dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+        dispatch(setInputDuel({
+            attacker: playerRole,
+            word: inputtedWord,
+            attacker_input_id: inputInstanceNumber,
+            attacked_input_id,
+            attackerArrowId: arrowKey
+        }));
     }
 
-    const checkInputErrors = (word) => {
+    const checkInputErrors = (activeInput, word) => {
         const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
         const inputAlreadyHaveError = inputError;
         const inEnglishDictionary = englishDictionary[word];
+        const alreadyAttacking = activeInput.active;
+        const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputTargets).find(targetObj => targetObj.target === activeInput.target && targetObj.active);
 
         if (word == "") {
             setInputError("input can not be empty");
@@ -79,6 +82,16 @@ const PlayerInput = ({
 
         if (!inEnglishDictionary) {
             setInputError("this is not an English word");
+            return true;
+        }
+
+        if (alreadyAttacking && !activeInput.active) {
+            setInputError("this target is already used");
+            return true;
+        }
+
+        if (targetIsAlreadyBeingAttacked && activeInput.status === "attacking") {
+            setInputError("this target is already attacked");
             return true;
         }
 
@@ -108,15 +121,27 @@ const PlayerInput = ({
                     onKeyDown={e => {
                         if (e.code === "Enter") {
                             const inputtedWord = e.target.value;
+                            const activeInput = playerObj.inputTargets[`input_${inputInstanceNumber}`];
+                            const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
 
-                            if (!checkInputErrors(inputtedWord)) {
-                                addArrowInstance(inputInstanceNumber, inputtedWord);
-                                const arrowTimerId = setInterval(() => {
-                                    const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_${inputInstanceNumber}`);
+                            if (!checkInputErrors(activeInput, inputtedWord)) {
+                                if (activeInput.status === "defending") {
+                                    clearInterval(activeInput.arrowToDefendTimerId);
+                                    document.getElementById(activeInput.arrowToDefendId).remove();
+                                }
+
+                                if (activeInput.status === "attacking") {
+                                    addArrowInstance(activeInput, inputtedWord);
                                     
-                                    arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
-                                    if (arrowTimerDiv.innerText <= 0) clearInterval(arrowTimerId);
-                                }, 1000);
+                                    const arrowTimerId = setInterval(() => {
+                                        const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
+                                        
+                                        arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
+                                        if (arrowTimerDiv.innerText <= 0) clearInterval(arrowTimerId);
+                                    }, 1000);
+                                    
+                                    dispatch(setArrowToDefendId({defender, arrowTimerId, attacker_input_id: activeInput.target }));
+                                }
                             }
                         }
                     }}
