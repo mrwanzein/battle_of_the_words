@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     addWordToUsedWord,
     setInputDuel,
-    setArrowToDefendId
+    setArrowToDefendId,
 } from "../redux/features/game/gameSlice";
 import Xarrow from "react-xarrows"
 import { useXarrow } from "react-xarrows";
@@ -13,10 +13,10 @@ import englishDictionary from "../../english_words_dictionary.json";
 import styled from "styled-components";
 
 const PlayerInput = ({
-    setArrows,
     playerRole,
     playerObj,
-    inputInstanceNumber
+    inputInstanceNumber,
+    setActiveArrows
 }) => {
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
     const dispatch = useDispatch();
@@ -25,31 +25,51 @@ const PlayerInput = ({
 
     const [inputError, setInputError] = useState(false);
 
-    const addArrowInstance = (attacked_input_id, arrowKey) => {
-        
-        setArrows(prev => [
+    const invokeBattle = (
+        attackerArrowKey,
+        defender,
+        attacked_input_id,
+        inputtedWord
+    ) => {
+        setActiveArrows(prev => [
             ...prev,
-            <div id={arrowKey} key={arrowKey}>
-                <Xarrow
-                    start={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
-                    end={`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}_word_attack_input_${attacked_input_id}`}
-                    labels={
-                        <div
-                            id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
-                            style={{
-                                border: "2px solid lightgrey",
-                                padding: "5px 12px",
-                                background: "#4d4d4d",
-                                color: "white"
-                            }}
-                        >
-                            5
-                        </div>
-                    }
-                    animateDrawing={0.3}
-                />
-            </div>
+            <Xarrow
+                key={attackerArrowKey}
+                start={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
+                end={`${defender}_word_attack_input_${attacked_input_id}`}
+                labels={
+                    <div
+                        id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
+                        style={{
+                            border: "2px solid lightgrey",
+                            padding: "5px 12px",
+                            background: "#4d4d4d",
+                            color: "white"
+                        }}
+                    >
+                        5
+                    </div>
+                }
+                animateDrawing={0.3}
+            />
         ]);
+
+        dispatch(setInputDuel({
+            attacker: playerRole,
+            word: inputtedWord,
+            attacker_input_id: inputInstanceNumber,
+            attacked_input_id,
+            attackerArrowId: attackerArrowKey
+        }));
+        
+        const arrowTimerId = setInterval(() => {
+            const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
+            
+            arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
+            if (arrowTimerDiv.innerText <= 0) clearInterval(arrowTimerId);
+        }, 1000);
+        
+        dispatch(setArrowToDefendId({defender, arrowTimerId, attacker_input_id: attacked_input_id }));
     }
 
     const checkInputErrors = (activeInput, word) => {
@@ -118,52 +138,20 @@ const PlayerInput = ({
                             const activeInput = playerObj.inputTargets[`input_${inputInstanceNumber}`];
                             const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
                             const attacked_input_id = activeInput.target;
-                            const arrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
+                            const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
+                            const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
 
                             if (!checkInputErrors(activeInput, inputtedWord, activeInput)) {
                                 dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                 
                                 if (activeInput.status === "defending") {
                                     clearInterval(activeInput.arrowToDefendTimerId);
-                                    document.getElementById(activeInput.arrowToDefendId).remove();
-                                    
-                                    addArrowInstance(attacked_input_id, arrowKey);
-                                    dispatch(setInputDuel({
-                                        attacker: playerRole,
-                                        word: inputtedWord,
-                                        attacker_input_id: inputInstanceNumber,
-                                        attacked_input_id,
-                                        attackerArrowId: arrowKey
-                                    }));
-                                    
-                                    const arrowTimerId = setInterval(() => {
-                                        const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
-                                        
-                                        arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
-                                        if (arrowTimerDiv.innerText <= 0) clearInterval(arrowTimerId);
-                                    }, 1000);
-                                    
-                                    dispatch(setArrowToDefendId({defender, arrowTimerId, attacker_input_id: activeInput.target }));
+                                    setActiveArrows(prev => prev.filter(arrow => arrow.key !== defenderArrowKey));
+                                    invokeBattle(attackerArrowKey, defender, attacked_input_id, inputtedWord);
                                 }
 
                                 if (activeInput.status === "attacking") {
-                                    addArrowInstance(attacked_input_id, arrowKey);
-                                    dispatch(setInputDuel({
-                                        attacker: playerRole,
-                                        word: inputtedWord,
-                                        attacker_input_id: inputInstanceNumber,
-                                        attacked_input_id,
-                                        attackerArrowId: arrowKey
-                                    }));
-                                    
-                                    const arrowTimerId = setInterval(() => {
-                                        const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
-                                        
-                                        arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
-                                        if (arrowTimerDiv.innerText <= 0) clearInterval(arrowTimerId);
-                                    }, 1000);
-                                    
-                                    dispatch(setArrowToDefendId({defender, arrowTimerId, attacker_input_id: activeInput.target }));
+                                    invokeBattle(attackerArrowKey, defender, attacked_input_id, inputtedWord);
                                 }
                             }
                         }

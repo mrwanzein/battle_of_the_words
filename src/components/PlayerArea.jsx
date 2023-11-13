@@ -1,11 +1,12 @@
-import { useState } from "react";
 import styled from "styled-components";
 import UsedWordsTracker from "./usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 
-const PlayerArea = ({ playerObj, playerRole }) => {
-    const [arrows, setArrows] = useState([]);
-
+const PlayerArea = ({
+    playerObj,
+    playerRole,
+    setActiveArrows
+}) => {
     return (
         <>
             <Wrapper>
@@ -17,17 +18,12 @@ const PlayerArea = ({ playerObj, playerRole }) => {
                     Array(5).fill(null).map((_, index) => 
                         <PlayerInput
                             key={`${playerRole}_input_${index + 1}`}
-                            arrows={arrows}
-                            setArrows={setArrows}
                             playerRole={playerRole}
                             playerObj={playerObj}
                             inputInstanceNumber={index + 1}
+                            setActiveArrows={setActiveArrows}
                         />
                     )
-                }
-
-                {
-                    arrows.map(arrowComponent => arrowComponent)
                 }
             </Wrapper>
         </>

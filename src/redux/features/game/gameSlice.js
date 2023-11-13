@@ -73,6 +73,7 @@ export const gameSlice = createSlice({
             oppositePlayerInputTargets.status = "defending";
             oppositePlayerInputTargets.wordToDefend = word;
             oppositePlayerInputTargets.arrowToDefendId = attackerArrowId;
+            oppositePlayerInputTargets.target = attacker_input_id;
         },
         setArrowToDefendId: (state, action) => {
             const {defender, arrowTimerId, attacker_input_id} = action.payload;
