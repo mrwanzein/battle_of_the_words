@@ -65,15 +65,17 @@ export const gameSlice = createSlice({
                 attackerArrowId
             } = action.payload;
             const oppositePlayer = attacker === "playerOne" ? "playerTwo" : "playerOne";
-            const oppositePlayerInputTargets = state[oppositePlayer].inputTargets[`input_${attacked_input_id}`];
+            const attackingPlayer = state[attacker].inputTargets[`input_${attacker_input_id}`];
+            const defendingPlayer = state[oppositePlayer].inputTargets[`input_${attacked_input_id}`];
 
-            state[attacker].inputTargets[`input_${attacker_input_id}`].active = true;
+            attackingPlayer.active = true;
+            attackingPlayer.status = "attacking";
 
-            oppositePlayerInputTargets.active = true;
-            oppositePlayerInputTargets.status = "defending";
-            oppositePlayerInputTargets.wordToDefend = word;
-            oppositePlayerInputTargets.arrowToDefendId = attackerArrowId;
-            oppositePlayerInputTargets.target = attacker_input_id;
+            defendingPlayer.active = true;
+            defendingPlayer.status = "defending";
+            defendingPlayer.wordToDefend = word;
+            defendingPlayer.arrowToDefendId = attackerArrowId;
+            defendingPlayer.target = attacker_input_id;
         },
         setArrowToDefendId: (state, action) => {
             const {defender, arrowTimerId, attacker_input_id} = action.payload;
