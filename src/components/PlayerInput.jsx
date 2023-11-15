@@ -4,7 +4,8 @@ import {
     addWordToUsedWord,
     setInputDuel,
     setArrowToDefendId,
-    decrementHitPoints
+    decrementHitPoints,
+    endInputDuel
 } from "../redux/features/game/gameSlice";
 import Xarrow from "react-xarrows"
 import { useXarrow } from "react-xarrows";
@@ -73,6 +74,7 @@ const PlayerInput = ({
                 setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
                 clearInterval(arrowTimerId);
                 dispatch(decrementHitPoints({player: defender, amount: inputtedWord.length}));
+                dispatch(endInputDuel({attacker: playerRole, attacker_input_id: inputInstanceNumber, attacked_input_id}));
             }
         }, 1000);
         

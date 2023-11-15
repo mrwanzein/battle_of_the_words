@@ -81,6 +81,17 @@ export const gameSlice = createSlice({
             const {defender, arrowTimerId, attacker_input_id} = action.payload;
 
             state[defender].inputTargets[`input_${attacker_input_id}`].arrowToDefendTimerId = arrowTimerId;
+        },
+        endInputDuel: (state, action) => {
+            const {
+                attacker,
+                attacker_input_id,
+                attacked_input_id
+            } = action.payload;
+            const oppositePlayer = attacker === "playerOne" ? "playerTwo" : "playerOne";
+            
+            state[attacker].inputTargets[`input_${attacker_input_id}`] = initialInputObj;
+            state[oppositePlayer].inputTargets[`input_${attacked_input_id}`] = initialInputObj;
         }
     }
 })
@@ -90,7 +101,8 @@ export const {
     setPlayerInputToTarget,
     addWordToUsedWord,
     setInputDuel,
-    setArrowToDefendId
+    setArrowToDefendId,
+    endInputDuel
 } = gameSlice.actions;
 
 export default gameSlice.reducer;
