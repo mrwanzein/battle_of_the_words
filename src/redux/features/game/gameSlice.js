@@ -4,6 +4,7 @@ const initialInputObj = {
     target: "1",
     active: false,
     status: "attacking",
+    attackingWord: null,
     wordToDefend: null,
     arrowToDefendId: null,
     arrowToDefendTimerId: null
@@ -70,6 +71,7 @@ export const gameSlice = createSlice({
 
             attackingPlayer.active = true;
             attackingPlayer.status = "attacking";
+            attackingPlayer.attackingWord = word;
 
             defendingPlayer.active = true;
             defendingPlayer.status = "defending";

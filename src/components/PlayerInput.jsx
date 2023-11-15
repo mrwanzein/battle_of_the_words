@@ -144,53 +144,79 @@ const PlayerInput = ({
                     />
                 }
 
-                <StyledInput
-                    type="text"
-                    id={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
-                    value={inputVal}
-                    onChange={(e) => setInputVal(e.target.value)}
-                    placeholder={
+                <div>
+                    {
                         currentInputObj.active &&
-                        currentInputObj.status === "defending" &&
-                        currentInputObj.wordToDefend ?
-                        currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
+                        currentInputObj.status === "attacking" ?
+                        <WordHUDWrapper>
+                            <span>{currentInputObj.attackingWord}</span>
+                            <span>{currentInputObj.attackingWord.length}</span>
+                        </WordHUDWrapper> : null
                     }
-                    disabled={currentInputObj.active && currentInputObj.status === "attacking"}
-                    onKeyDown={e => {
-                        if (e.code === "Enter") {
-                            const inputtedWord = e.target.value;
-                            const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
-                            const attacked_input_id = currentInputObj.target;
-                            const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
-                            const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
 
-                            if (!checkInputErrors(inputtedWord)) {
-                                dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
-                                setInputVal("");
-                                
-                                if (currentInputObj.status === "defending") {
-                                    clearInterval(currentInputObj.arrowToDefendTimerId);
-                                    setActiveArrows(prev => prev.filter(arrow => arrow.key !== defenderArrowKey));
-                                    invokeBattle(
-                                        attackerArrowKey,
-                                        defender,
-                                        attacked_input_id,
-                                        inputtedWord,
-                                    );
-                                }
+                    {
+                        playerRole === "playerOne" &&
+                        currentInputObj.status === "defending" ?
+                        <PlayerOneDefendingWordLength>{inputVal.length}</PlayerOneDefendingWordLength> : null
+                    }
 
-                                if (currentInputObj.status === "attacking") {
-                                    invokeBattle(
-                                        attackerArrowKey,
-                                        defender,
-                                        attacked_input_id,
-                                        inputtedWord,
-                                    );
+                    {
+                        playerRole === "playerTwo" &&
+                        currentInputObj.status === "defending" ?
+                        <PlayerTwoDefendingWordLength>{inputVal.length}</PlayerTwoDefendingWordLength> : null
+                    }
+                    
+                    <StyledInput
+                        type="text"
+                        id={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
+                        value={inputVal}
+                        onChange={(e) => setInputVal(e.target.value)}
+                        placeholder={
+                            currentInputObj.active &&
+                            currentInputObj.status === "defending" &&
+                            currentInputObj.wordToDefend ?
+                            currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
+                        }
+                        disabled={currentInputObj.active && currentInputObj.status === "attacking"}
+                        style={{
+                            outlineColor: currentInputObj.status === "defending" && inputVal.length >= currentInputObj.wordToDefend.length ? "lightgreen" : "initial"
+                        }}
+                        onKeyDown={e => {
+                            if (e.code === "Enter") {
+                                const inputtedWord = e.target.value;
+                                const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
+                                const attacked_input_id = currentInputObj.target;
+                                const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
+                                const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
+
+                                if (!checkInputErrors(inputtedWord)) {
+                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+                                    setInputVal("");
+                                    
+                                    if (currentInputObj.status === "defending") {
+                                        clearInterval(currentInputObj.arrowToDefendTimerId);
+                                        setActiveArrows(prev => prev.filter(arrow => arrow.key !== defenderArrowKey));
+                                        invokeBattle(
+                                            attackerArrowKey,
+                                            defender,
+                                            attacked_input_id,
+                                            inputtedWord,
+                                        );
+                                    }
+
+                                    if (currentInputObj.status === "attacking") {
+                                        invokeBattle(
+                                            attackerArrowKey,
+                                            defender,
+                                            attacked_input_id,
+                                            inputtedWord,
+                                        );
+                                    }
                                 }
                             }
-                        }
-                    }}
-                />
+                        }}
+                    />
+                </div>
 
                 {
                     playerRole === "playerTwo" &&
@@ -217,4 +243,24 @@ const StyledInput = styled.input`
     margin: 15px;
     padding: 10px;
     width: 300px;
+    border-style: solid;
+    border-width: 1px;
+`
+
+const WordHUDWrapper = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin: 0 15px;
+    margin-bottom: -10px;
+`
+
+const PlayerOneDefendingWordLength = styled.span`
+    float: right;
+    margin: 0 15px;
+    margin-bottom: -10px;
+`
+
+const PlayerTwoDefendingWordLength = styled.span`
+    margin: 0 15px;
+    margin-bottom: -10px;
 `
