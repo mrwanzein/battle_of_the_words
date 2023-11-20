@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import Arena from "./components/Arena";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./home/HomePage";
-import Home from "./home/Home";
-import Tutorial from "./home/Tutorial";
-import Rooms from "./home/Rooms";
+import HomePage from "./components/home/HomePage";
+import Home from "./components/home/Home";
+import Tutorial from "./components/home/Tutorial";
+import Rooms from "./components/home/Rooms";
 import io from "socket.io-client";
 
 // const socket = io("http://localhost:3000");

@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import styled from "styled-components";
-import { MakeWholeDivAsLink } from "../components/shared_styles/sharedStyles";
+import { MakeWholeDivAsLink } from "../shared_styles/sharedStyles";
 
 const HomePage = () => {
     return (
@@ -70,6 +70,7 @@ const LinksWrapper = styled.div`
 
     a {
         text-decoration: none;
+        color: black;
 
         &:active {
             color: initial;
