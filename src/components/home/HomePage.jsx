@@ -56,8 +56,10 @@ const HomePage = () => {
 export default HomePage;
 
 const HomePageArea = styled.div`
-    height: 600px;
-    width: 800px;
+    display: flex;
+    flex-direction: column;
+    height: 700px;
+    width: 1000px;
     border: 2px solid black;
     border-radius: 10px;
 `

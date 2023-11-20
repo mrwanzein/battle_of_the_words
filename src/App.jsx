@@ -5,9 +5,6 @@ import HomePage from "./components/home/HomePage";
 import Home from "./components/home/Home";
 import Tutorial from "./components/home/Tutorial";
 import Rooms from "./components/home/Rooms";
-import io from "socket.io-client";
-
-// const socket = io("http://localhost:3000");
 
 function App() {
   return (
