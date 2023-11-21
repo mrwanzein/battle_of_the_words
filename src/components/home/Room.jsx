@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { JoinRoomButtonGeneric } from "../shared_styles/sharedStyles";
 
-const Room = () => {
+const Room = ({ roomName }) => {
     return (
         <RoomWrapper>
             <RoomContentWrapper>
                 <HostAndOpponentWrapper>
-                    <RoomsName>Rooms name</RoomsName>
+                    <RoomsName>{roomName}</RoomsName>
                 </HostAndOpponentWrapper>
 
                 <JoinRoomButtonRoomsArea>JOIN ROOM</JoinRoomButtonRoomsArea>

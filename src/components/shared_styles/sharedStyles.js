@@ -71,3 +71,12 @@ export const JoinRoomButtonGeneric = styled.button`
 	    top: 1px;
     }
 `
+
+export const centerModalStyles = {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+}
