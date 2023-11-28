@@ -46,6 +46,11 @@ export const GenericButton = styled.button`
         position: relative;
 	    top: 1px;
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
 `
 
 export const JoinRoomButtonGeneric = styled.button`
@@ -62,21 +67,27 @@ export const JoinRoomButtonGeneric = styled.button`
 	text-shadow:0px 1px 0px #2f6627;
 
     &:hover {
-        background: linear-gradient(to bottom, #0688fa 5%, #2dabf9 100%);
-	    background-color: #0688fa;
+        opacity: .7;
     }
 
     &:active {
         position: relative;
 	    top: 1px;
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
 `
 
-export const centerModalStyles = {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-}
+export const GenericIconButton = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+`
