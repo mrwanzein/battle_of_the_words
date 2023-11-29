@@ -3,8 +3,8 @@ import Arena from "./components/Arena";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./components/home/HomePage";
 import Home from "./components/home/Home";
-import Tutorial from "./components/home/Tutorial";
-import Rooms from "./components/home/Rooms";
+import Tutorial from "./components/tutorial/Tutorial";
+import Rooms from "./components/room/Rooms";
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
             <Route path="/rooms" element={<Rooms />} />
           </Route>
 
-          <Route path="/arena" element={<Arena />} />
+          <Route path="/arena/:roomId" element={<Arena />} />
         </Routes>
       </AppWrapper>
     </BrowserRouter>

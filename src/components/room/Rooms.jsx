@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { GenericButton, GenericIconButton } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
 import { FiRefreshCw } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { addRoomInfoToJoinedRooms } from "../../redux/features/rooms/roomSlice";
+import { useNavigate } from "react-router-dom";
 import ErrorModal from "../modals/ErrorModal";
 import GenericModal from "../modals/GenericModal";
 import styled, { css } from "styled-components";
@@ -25,6 +28,9 @@ const Rooms = () => {
     const [whileGettingRooms, setWhileGettingRooms] = useState(true);
     
     const [serverErrorType, setServerErrorType] = useState("error");
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         getSocketId();
@@ -99,6 +105,9 @@ const Rooms = () => {
             } else {
                 switch(res.status) {
                     case "ok":
+                        const joinedRoom = res.rooms.find(room => room[0] === roomNameInput);
+                        dispatch(addRoomInfoToJoinedRooms(joinedRoom));
+                        navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);
                         break;
                     case "error":
