@@ -7,12 +7,14 @@ import {
     decrementHitPoints,
     endInputDuel
 } from "../redux/features/game/gameSlice";
+import { calculatePercentageLengthOfDefendingWord } from "../utils";
 import Xarrow from "react-xarrows"
 import { useXarrow } from "react-xarrows";
 import WordInputErrors from "./errors/WordInputErrors";
 import PlayerTargetInput from "./PlayerTargetInput";
 import englishDictionary from "../../english_words_dictionary.json";
 import styled from "styled-components";
+import WordLengthTrackingBar from "./misc/WordLengthTrackingBar";
 
 const PlayerInput = ({
     playerRole,
@@ -51,7 +53,7 @@ const PlayerInput = ({
                             color: "white"
                         }}
                     >
-                        5
+                        30
                     </div>
                 }
                 animateDrawing={0.3}
@@ -155,15 +157,13 @@ const PlayerInput = ({
                     }
 
                     {
-                        playerRole === "playerOne" &&
-                        currentInputObj.status === "defending" ?
-                        <PlayerOneDefendingWordLength>{inputVal.length}</PlayerOneDefendingWordLength> : null
-                    }
-
-                    {
-                        playerRole === "playerTwo" &&
-                        currentInputObj.status === "defending" ?
-                        <PlayerTwoDefendingWordLength>{inputVal.length}</PlayerTwoDefendingWordLength> : null
+                        currentInputObj.status === "defending" &&
+                        <WordHUDWrapper>
+                            <WordLengthTrackingBar
+                                trackingPercentage={calculatePercentageLengthOfDefendingWord(inputVal.length, currentInputObj.wordToDefend.length)}
+                            />
+                            <span>{inputVal.length}</span>
+                        </WordHUDWrapper>
                     }
                     
                     <StyledInput
@@ -178,9 +178,6 @@ const PlayerInput = ({
                             currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
                         }
                         disabled={currentInputObj.active && currentInputObj.status === "attacking"}
-                        style={{
-                            outlineColor: currentInputObj.status === "defending" && inputVal.length >= currentInputObj.wordToDefend.length ? "lightgreen" : "initial"
-                        }}
                         onKeyDown={e => {
                             if (e.code === "Enter") {
                                 const inputtedWord = e.target.value;
@@ -250,17 +247,7 @@ const StyledInput = styled.input`
 const WordHUDWrapper = styled.div`
     display: flex;
     justify-content: space-between;
-    margin: 0 15px;
-    margin-bottom: -10px;
-`
-
-const PlayerOneDefendingWordLength = styled.span`
-    float: right;
-    margin: 0 15px;
-    margin-bottom: -10px;
-`
-
-const PlayerTwoDefendingWordLength = styled.span`
+    align-items: center;
     margin: 0 15px;
     margin-bottom: -10px;
 `
