@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import styled from "styled-components";
-import Arena from "./components/Arena";
+import Arena from "./components/gameplay/Arena";
 import HomePage from "./components/home/HomePage";
 import Home from "./components/home/Home";
 import Tutorial from "./components/tutorial/Tutorial";
@@ -20,7 +20,9 @@ function App() {
             <Route path="/rooms" element={<Rooms />} />
           </Route>
 
-          <Route path="/arena/:roomId" element={<Arena />} />
+          <Route path="/arena" element={<Arena />}>
+            <Route path="/arena/:roomId" element={<Arena />}/>
+          </Route>
         </Routes>
       </AppWrapper>
     </BrowserRouter>

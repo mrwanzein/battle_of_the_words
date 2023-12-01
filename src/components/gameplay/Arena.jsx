@@ -16,9 +16,9 @@ const Arena = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const isInRoomThatExists = currentRoom[1].id === roomId;
+        const isInRoomThatExists = currentRoom && currentRoom[1].id === roomId;
 
-        if (!isInRoomThatExists) {
+        if (roomId && !isInRoomThatExists) {
             navigate("/");
         }
 

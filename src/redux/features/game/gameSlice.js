@@ -11,6 +11,7 @@ const initialInputObj = {
 }
 
 const initialState = {
+    isPlayingOnline: false,
     playerOne: {
         hitPoints: 1000,
         inputTargets: {
@@ -40,6 +41,9 @@ export const gameSlice = createSlice({
     name: "gameState",
     initialState,
     reducers: {
+        setIsPlayingOnline: (state, action) => {
+            state.isPlayingOnline = action.payload;
+        },
         decrementHitPoints: (state, action) => {
             const {player, amount} = action.payload;
             state[player].hitPoints -= amount;
@@ -104,7 +108,8 @@ export const {
     addWordToUsedWord,
     setInputDuel,
     setArrowToDefendId,
-    endInputDuel
+    endInputDuel,
+    setIsPlayingOnline
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

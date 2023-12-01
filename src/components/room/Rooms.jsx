@@ -5,6 +5,7 @@ import { FiRefreshCw } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { addRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
+import { setIsPlayingOnline } from "../../redux/features/game/gameSlice";
 import ErrorModal from "../modals/ErrorModal";
 import GenericModal from "../modals/GenericModal";
 import styled, { css } from "styled-components";
@@ -106,6 +107,7 @@ const Rooms = () => {
                 switch(res.status) {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomNameInput);
+                        dispatch(setIsPlayingOnline(true));
                         dispatch(addRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);

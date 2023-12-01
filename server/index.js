@@ -145,6 +145,20 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on("send typing words to opponent", ({inputVal, inputInstanceNumber, roomName}, callback) => {
+        try {
+            socket.to(roomName).emit("show typing words from opponent", {inputVal, inputInstanceFromServer: inputInstanceNumber});
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
     socket.on("disconnect", reason => {
         for (const roomName in activeRooms) {
             const participants = activeRooms[roomName].participants;
