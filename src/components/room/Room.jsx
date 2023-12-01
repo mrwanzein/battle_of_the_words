@@ -2,7 +2,7 @@ import { useState } from "react";
 import { JoinRoomButtonGeneric } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
 import { useDispatch } from "react-redux";
-import { addRoomInfoToJoinedRooms } from "../../redux/features/rooms/roomSlice";
+import { addRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import LoadingSpinner from "../misc/LoadingSpinner";
@@ -24,7 +24,7 @@ const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner })
                 switch(res.status) {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomName);
-                        dispatch(addRoomInfoToJoinedRooms(joinedRoom));
+                        dispatch(addRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);
                         break;

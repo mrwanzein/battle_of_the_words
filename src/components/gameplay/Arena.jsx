@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const Arena = () => {
     const playerOne = useSelector(state => state.gameState.playerOne);
     const playerTwo = useSelector(state => state.gameState.playerTwo);
-    const joinedRooms = useSelector(state => state.roomState.joinedRooms);
+    const currentRoom = useSelector(state => state.roomState.currentRoom);
     
     const [activeArrows, setActiveArrows] = useState([]);
 
@@ -16,7 +16,7 @@ const Arena = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const isInRoomThatExists = joinedRooms.find(room => room[1].id === roomId);
+        const isInRoomThatExists = currentRoom[1].id === roomId;
 
         if (!isInRoomThatExists) {
             navigate("/");

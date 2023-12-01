@@ -1,21 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    joinedRooms: []
+    currentRoom: null
 }
 
 export const roomSlice = createSlice({
     name: "roomState",
     initialState,
     reducers: {
-        addRoomInfoToJoinedRooms: (state, action) => {
-            state.joinedRooms.push(action.payload);
+        addRoomInfo: (state, action) => {
+            state.currentRoom = action.payload;
         }
     }
 })
 
 export const {
-    addRoomInfoToJoinedRooms
+    addRoomInfo
 } = roomSlice.actions;
 
 export default roomSlice.reducer;
