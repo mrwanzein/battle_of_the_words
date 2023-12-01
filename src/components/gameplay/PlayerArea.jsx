@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import UsedWordsTracker from "./usedWords/UsedWordsTracker";
+import UsedWordsTracker from "../usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 
 const PlayerArea = ({

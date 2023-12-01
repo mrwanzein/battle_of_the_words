@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { setPlayerInputToTarget } from "../redux/features/game/gameSlice";
+import { setPlayerInputToTarget } from "../../redux/features/game/gameSlice";
 
 const PlayerTargetInput = ({ playerRole, inputNumber, playerObj }) => {
     const dispatch = useDispatch();

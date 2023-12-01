@@ -6,15 +6,15 @@ import {
     setArrowToDefendId,
     decrementHitPoints,
     endInputDuel
-} from "../redux/features/game/gameSlice";
-import { calculatePercentageLengthOfDefendingWord } from "../utils";
+} from "../../redux/features/game/gameSlice";
+import { calculatePercentageLengthOfDefendingWord } from "../../utils";
 import Xarrow from "react-xarrows"
 import { useXarrow } from "react-xarrows";
-import WordInputErrors from "./errors/WordInputErrors";
+import WordInputErrors from "../errors/WordInputErrors";
 import PlayerTargetInput from "./PlayerTargetInput";
-import englishDictionary from "../../english_words_dictionary.json";
+import englishDictionary from "../../../english_words_dictionary.json";
 import styled from "styled-components";
-import WordLengthTrackingBar from "./misc/WordLengthTrackingBar";
+import WordLengthTrackingBar from "../misc/WordLengthTrackingBar";
 
 const PlayerInput = ({
     playerRole,
