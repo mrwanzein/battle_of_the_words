@@ -4,7 +4,7 @@ import { socket } from "../../services/socket";
 import { useDispatch } from "react-redux";
 import { addRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
-import { setIsPlayingOnline } from "../../redux/features/game/gameSlice";
+import { setIsInOnlineBattle } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 import LoadingSpinner from "../misc/LoadingSpinner";
 
@@ -25,7 +25,7 @@ const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner })
                 switch(res.status) {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomName);
-                        dispatch(setIsPlayingOnline(true));
+                        dispatch(setIsInOnlineBattle(true));
                         dispatch(addRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);

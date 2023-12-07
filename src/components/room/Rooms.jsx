@@ -5,7 +5,7 @@ import { FiRefreshCw } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { addRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
-import { setIsPlayingOnline } from "../../redux/features/game/gameSlice";
+import { setIsInOnlineBattle } from "../../redux/features/game/gameSlice";
 import ErrorModal from "../modals/ErrorModal";
 import GenericModal from "../modals/GenericModal";
 import styled, { css } from "styled-components";
@@ -107,7 +107,7 @@ const Rooms = () => {
                 switch(res.status) {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomNameInput);
-                        dispatch(setIsPlayingOnline(true));
+                        dispatch(setIsInOnlineBattle(true));
                         dispatch(addRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);
@@ -143,6 +143,7 @@ const Rooms = () => {
 
             <AboveRoomsWrapper>
                 <SearchRoomNameInput
+                    id="searchRoomNameInput"
                     type="text"
                     placeholder="Search room name"
                     value={searchRoomNameInput}
@@ -188,7 +189,13 @@ const Rooms = () => {
                             setRoomNameInput(input);
                         }
                     }}
+                    onKeyDown={e => {
+                        if (e.code === "Enter") {
+                            if (roomNameInput.length !== 0 && !roomNameInputError && !whileCreatingRoom) createRoom();
+                        }
+                    }}
                     autoComplete="off"
+                    autoFocus
                 />
 
                 <CreateRoomButtonInModal

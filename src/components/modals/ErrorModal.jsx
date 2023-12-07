@@ -6,7 +6,6 @@ import { BiError } from "react-icons/bi";
 const iconStyles = {
     fontSize: "3em",
     margin: "20px",
-    color: "white"
 }
 
 const ErrorModal = ({ modalIsOpen, onCloseModalFn, errorType, errorMsg }) => {
@@ -19,8 +18,8 @@ const ErrorModal = ({ modalIsOpen, onCloseModalFn, errorType, errorMsg }) => {
                 <ErrorIconWrapper>
                     {
                         {
-                            error: <BiErrorAlt style={iconStyles} />,
-                            warning: <BiError style={iconStyles} />
+                            error: <BiErrorAlt style={{...iconStyles, color: "white"}} />,
+                            warning: <BiError style={{...iconStyles, color: "#8a8115"}} />
                         }[errorType]
                     }
                 </ErrorIconWrapper>
@@ -38,7 +37,7 @@ export default ErrorModal;
 const ErrorWrapper = styled.div`
     display: flex;
     border-radius: 5px;
-    background-color: ${({$errorType}) => ({error: "#ff4949", warning: "#ffd100"}[$errorType])};
+    background-color: ${({$errorType}) => ({error: "#ff4949", warning: "#fff600"}[$errorType])};
     margin-bottom: 30px;
 `
 
@@ -46,7 +45,6 @@ const ErrorIconWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border-right: 1px solid black;
     margin: 15px 0;
 `
 
@@ -57,6 +55,6 @@ const ErrorMessageWrapper = styled.div`
 `
 
 const ErrorMessageStyle = styled.span`
-    margin: 15px;
-    color: ${({$errorType}) => ({error: "white", warning: "#454545"}[$errorType])};
+    margin: 15px 5px;
+    color: ${({$errorType}) => ({error: "white", warning: "#555207"}[$errorType])};
 `
