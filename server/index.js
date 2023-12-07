@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
             await socket.join(roomName);
             
             if (!activeRooms[roomName]) {
-                activeRooms[roomName] = {owner: socket.id, id: generateRoomId(), participants: [socket.id]}
+                activeRooms[roomName] = {owner: socket.id, id: generateRoomId(), participants: [socket.id], [socket.id]: {}}
             } else {
                 throw new Error("room already exists");
             }
@@ -83,6 +83,7 @@ io.on('connection', (socket) => {
             
             if (activeRooms[roomName]) {
                 activeRooms[roomName].participants.push(socket.id);
+                activeRooms[roomName][socket.id] = {};
             } else {
                 throw new Error("room doesn't exists");
             }
@@ -148,6 +149,66 @@ io.on('connection', (socket) => {
     socket.on("send typing words to opponent", ({inputVal, inputInstanceNumber, roomName}, callback) => {
         try {
             socket.to(roomName).emit("show typing words from opponent", {inputVal, inputInstanceFromServer: inputInstanceNumber});
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
+    socket.on("send entered word to opponent", ({
+        inputtedWord,
+        inputInstanceNumber,
+        attacked_input_id,
+        roomName,
+        arrowId,
+        arrowTimerId,
+        playerStatus
+    }, callback) => {
+        const roomObj = activeRooms[roomName];
+        roomObj[socket.id][`input_${inputInstanceNumber}`] = {arrowId, arrowTimerId}
+        const opponentId = roomObj.participants.find(participant => participant !== socket.id);
+
+        try {
+            socket.to(roomName).emit("process entered word from opponent", {
+                inputtedWord,
+                inputInstanceFromServer: inputInstanceNumber,
+                attacked_input_id,
+                oldArrowToDelete: roomObj[opponentId][`input_${attacked_input_id}`],
+                playerStatus
+            });
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+    
+    socket.on("send input target update", ({targetVal, inputNumber, roomName}, callback) => {
+        try {
+            socket.to(roomName).emit("update target input", {targetVal, inputInstanceFromServer: inputNumber});
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
+    socket.on("clear old attacking word", ({attacked_input_id, roomName}, callback) => {
+        try {
+            socket.to(roomName).emit("clear old attacking word", {attacked_input_id});
 
             callback({
                 status: "ok"

@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     addWordToUsedWord,
     setInputDuel,
     setArrowToDefendId,
     decrementHitPoints,
-    endInputDuel
+    endInputDuel,
+    setPlayerInputToTarget
 } from "../../redux/features/game/gameSlice";
 import { calculatePercentageLengthOfDefendingWord } from "../../utils";
 import { useXarrow } from "react-xarrows";
@@ -23,7 +24,7 @@ const PlayerInput = ({
     inputInstanceNumber,
     setActiveArrows
 }) => {
-    const isOnline = useSelector(state => state.gameState.isPlayingOnline);
+    const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     const dispatch = useDispatch();
@@ -34,83 +35,219 @@ const PlayerInput = ({
     const [inputVal, setInputVal] = useState("");
     const [inputError, setInputError] = useState(false);
 
+    // remove for production?
+    const skippedFirstRenderOfDoubleRender = useRef(false);
+
     useEffect(() => {
-        socket.on("show typing words from opponent", ({inputVal, inputInstanceFromServer}) => {
-            if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
-                setInputVal(inputVal);
-            }
-        });
+        if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
+            socket.on("show typing words from opponent", ({inputVal, inputInstanceFromServer}) => {
+                if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
+                    setInputVal(inputVal);
+                }
+            });
+    
+            socket.on("process entered word from opponent", ({
+                inputtedWord,
+                inputInstanceFromServer,
+                attacked_input_id,
+                oldArrowToDelete,
+                playerStatus
+            }) => {
+                if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
+                    dispatch(addWordToUsedWord({player: "playerTwo", word: inputtedWord}));
+                    invokeBattleOnline(attacked_input_id, inputtedWord, inputInstanceFromServer, oldArrowToDelete, playerStatus);
+                }
+            });
+
+            socket.on("update target input", ({targetVal, inputInstanceFromServer}) => {
+                if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
+                    dispatch(setPlayerInputToTarget({player: "playerTwo", selectedInput: inputInstanceFromServer, target: targetVal}))
+                }
+            });
+
+            socket.on("clear old attacking word", ({attacked_input_id}) => {
+                if (playerRole === "playerTwo" && attacked_input_id === inputInstanceNumber) {
+                    setInputVal("");
+                }
+            });
+        }
+
+        return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
 
     const invokeBattle = (
         attackerArrowKey,
         defender,
         attacked_input_id,
-        inputtedWord
+        inputtedWord,
+        playerStatus = "attacking"
     ) => {
-        if (isOnline) {
-
-        } else {
-            setActiveArrows(prev => [
-                ...prev,
-                <Xarrow
-                    key={attackerArrowKey}
-                    start={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
-                    end={`${defender}_word_attack_input_${attacked_input_id}`}
-                    labels={
-                        <div
-                            id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
-                            style={{
-                                border: "2px solid lightgrey",
-                                padding: "5px 12px",
-                                background: "#4d4d4d",
-                                color: "white"
-                            }}
-                        >
-                            30
-                        </div>
-                    }
-                    animateDrawing={0.3}
-                />
-            ]);
-    
-            dispatch(setInputDuel({
-                attacker: playerRole,
-                word: inputtedWord,
-                attacker_input_id: inputInstanceNumber,
-                attacked_input_id,
-                attackerArrowId: attackerArrowKey
-            }));
-            
-            const arrowTimerId = setInterval(() => {
-                const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
-                
-                arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
-                if (arrowTimerDiv.innerText < 0) {
-                    setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
-                    clearInterval(arrowTimerId);
-                    dispatch(decrementHitPoints({player: defender, amount: inputtedWord.length}));
-                    dispatch(endInputDuel({attacker: playerRole, attacker_input_id: inputInstanceNumber, attacked_input_id}));
+        setActiveArrows(prev => [
+            ...prev,
+            <Xarrow
+                key={attackerArrowKey}
+                start={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
+                end={`${defender}_word_attack_input_${attacked_input_id}`}
+                labels={
+                    <div
+                        id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
+                        style={{
+                            border: "2px solid lightgrey",
+                            padding: "5px 12px",
+                            background: "#4d4d4d",
+                            color: "white"
+                        }}
+                    >
+                        120
+                    </div>
                 }
-            }, 1000);
-            
-            dispatch(setArrowToDefendId({defender, arrowTimerId, attacker_input_id: attacked_input_id }));
-        }
-    }
-    
-    const showToOpponentTypingWords = (e) => {
-        const inputVal = e.target.value;
-        setInputVal(inputVal);
+                animateDrawing={0.3}
+            />
+        ]);
 
-        if (isOnline) {
-            socket.timeout(5000).emit("send typing words to opponent", {inputVal, inputInstanceNumber, roomName: currentRoom[0]}, (err, res) => {
+        const arrowTimerId = setInterval(() => {
+            const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
+            
+            arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
+            if (arrowTimerDiv.innerText < 0) {
+                setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
+                clearInterval(arrowTimerId);
+                dispatch(decrementHitPoints({player: defender, amount: inputtedWord.length}));
+                dispatch(endInputDuel({attacker: playerRole, attacker_input_id: inputInstanceNumber, attacked_input_id}));
+            }
+        }, 1000);
+
+        if (isInOnlineBattle) {
+            socket.timeout(3000).emit("send entered word to opponent",
+            {
+                inputtedWord,
+                inputInstanceNumber,
+                attacked_input_id,
+                roomName: currentRoom[0],
+                arrowId: attackerArrowKey,
+                arrowTimerId,
+                playerStatus
+            },
+            (err, res) => {
                 if (err) {
                     console.log('fatal error');
                 } else {
                     // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            console.log('sent');
+                            
+                            break;
+                        case "error":
+                            console.log('error');
+                            break;
+                        case "warning":
+                            break;
+                        default:
+                    }
+                }
+            });
+        }
+
+        dispatch(setInputDuel({
+            attacker: playerRole,
+            word: inputtedWord,
+            attacker_input_id: inputInstanceNumber,
+            attacked_input_id,
+            attackerArrowId: attackerArrowKey
+        }));
+
+        dispatch(setArrowToDefendId({defender, arrowTimerId, attacker_input_id: attacked_input_id}));
+    }
+
+    const invokeBattleOnline = (attacked_input_id, inputtedWord, inputInstanceFromServer, oldArrowToDelete, playerStatus) => {
+        if (playerStatus === "defending") {
+            socket.timeout(3000).emit("clear old attacking word", {attacked_input_id, roomName: currentRoom[0]}, (err, res) => {
+                if (err) {
+                    console.log('fatal error');
+                } else {
+                    // TODO: finish this
+                    switch(res.status) {
+                        case "ok":
+                            
+                            break;
+                        case "error":
+                            console.log('error');
+                            break;
+                        case "warning":
+                            break;
+                        default:
+                    }
+                }
+            });
+        }
+        
+        if (oldArrowToDelete) {
+            setActiveArrows(prev => prev.filter(arrow => arrow.key !== oldArrowToDelete.arrowId));
+            clearInterval(oldArrowToDelete.arrowTimerId);
+        }
+        
+        const attackerArrowKey = `playerTwo_word_attack_input_${inputInstanceFromServer}_attacking_input_${attacked_input_id}`;
+        
+        setActiveArrows(prev => [
+            ...prev,
+            <Xarrow
+                key={attackerArrowKey}
+                start={`playerTwo_word_attack_input_${inputInstanceFromServer}`}
+                end={`playerOne_word_attack_input_${attacked_input_id}`}
+                labels={
+                    <div
+                        id={`playerTwo_active_arrow_timer_${inputInstanceFromServer}`}
+                        style={{
+                            border: "2px solid lightgrey",
+                            padding: "5px 12px",
+                            background: "#4d4d4d",
+                            color: "white"
+                        }}
+                    >
+                        120
+                    </div>
+                }
+                animateDrawing={0.3}
+            />
+        ]);
+        
+        dispatch(setInputDuel({
+            attacker: "playerTwo",
+            word: inputtedWord,
+            attacker_input_id: inputInstanceFromServer,
+            attacked_input_id,
+            attackerArrowId: attackerArrowKey
+        }));
+
+        const arrowTimerId = setInterval(() => {
+            const arrowTimerDiv = document.getElementById(`playerTwo_active_arrow_timer_${inputInstanceFromServer}`);
+            
+            arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
+            if (arrowTimerDiv.innerText < 0) {
+                if (inputInstanceFromServer === inputInstanceNumber) setInputVal("");
+                setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
+                clearInterval(arrowTimerId);
+                dispatch(decrementHitPoints({player: "playerOne", amount: inputtedWord.length}));
+                dispatch(endInputDuel({attacker: "playerTwo", attacker_input_id: inputInstanceFromServer, attacked_input_id}));
+            }
+        }, 1000);
+        
+        dispatch(setArrowToDefendId({defender: "playerOne", arrowTimerId, attacker_input_id: attacked_input_id}));
+    }
+    
+    const showToOpponentTypingWords = (e) => {
+        const inputVal = e.target.value;
+        setInputVal(inputVal);
+
+        if (isInOnlineBattle) {
+            socket.timeout(3000).emit("send typing words to opponent", {inputVal, inputInstanceNumber, roomName: currentRoom[0]}, (err, res) => {
+                if (err) {
+                    console.log('fatal error');
+                } else {
+                    // TODO: finish this
+                    switch(res.status) {
+                        case "ok":
+                            
                             break;
                         case "error":
                             console.log('error');
@@ -132,7 +269,7 @@ const PlayerInput = ({
         const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputTargets).find(targetObj => targetObj.target === currentInputObj.target && targetObj.active);
         const wordToDefend = currentInputObj.wordToDefend
 
-        if (word == "") {
+        if (word === "") {
             setInputError("input can not be empty");
             return true;
         }
@@ -184,6 +321,7 @@ const PlayerInput = ({
                         inputNumber={inputInstanceNumber}
                         playerRole={playerRole}
                         playerObj={playerObj}
+                        currentRoom={isInOnlineBattle && currentRoom[0]}
                     />
                 }
 
@@ -218,11 +356,12 @@ const PlayerInput = ({
                             currentInputObj.wordToDefend ?
                             currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
                         }
-                        disabled={currentInputObj.active && currentInputObj.status === "attacking"}
+                        disabled={currentInputObj.active && currentInputObj.status === "attacking" || isInOnlineBattle && playerRole === "playerTwo"}
                         onKeyDown={e => {
                             if (e.code === "Enter") {
                                 const inputtedWord = e.target.value;
                                 const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
+                                const playerStatus = currentInputObj.status;
                                 const attacked_input_id = currentInputObj.target;
                                 const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
                                 const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
@@ -231,18 +370,20 @@ const PlayerInput = ({
                                     dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                     setInputVal("");
                                     
-                                    if (currentInputObj.status === "defending") {
+                                    if (playerStatus === "defending") {
                                         clearInterval(currentInputObj.arrowToDefendTimerId);
                                         setActiveArrows(prev => prev.filter(arrow => arrow.key !== defenderArrowKey));
+                                        
                                         invokeBattle(
                                             attackerArrowKey,
                                             defender,
                                             attacked_input_id,
-                                            inputtedWord
+                                            inputtedWord,
+                                            playerStatus
                                         );
                                     }
 
-                                    if (currentInputObj.status === "attacking") {
+                                    if (playerStatus === "attacking") {
                                         invokeBattle(
                                             attackerArrowKey,
                                             defender,
@@ -262,6 +403,7 @@ const PlayerInput = ({
                         inputNumber={inputInstanceNumber}
                         playerRole={playerRole}
                         playerObj={playerObj}
+                        isInOnlineBattle={isInOnlineBattle}
                     />
                 }
             </InputWrapper>
@@ -281,8 +423,16 @@ const StyledInput = styled.input`
     margin: 15px;
     padding: 10px;
     width: 300px;
-    border-style: solid;
-    border-width: 1px;
+    border: 1px solid black;
+
+    &:disabled {
+        cursor: default;
+        margin: 15px;
+        padding: 10px;
+        width: 300px;
+        border: 1px solid black;
+        background: white;
+    }
 `
 
 const WordHUDWrapper = styled.div`
