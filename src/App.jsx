@@ -5,6 +5,7 @@ import Home from "./components/home/Home";
 import Tutorial from "./components/tutorial/Tutorial";
 import Rooms from "./components/room/Rooms";
 import Navbar from "./components/navbar/Navbar";
+import PageNotFound from "./PageNotFound";
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
         <Route path="/arena" element={<Arena />}>
           <Route path="/arena/:roomId" element={<Arena />}/>
         </Route>
+
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
   )
