@@ -50,6 +50,10 @@ export default Arena;
 
 const Wrapper = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+
+    @media only screen and (min-height: 768px) {
+        height: calc(100% - 80px);
+    }
 `

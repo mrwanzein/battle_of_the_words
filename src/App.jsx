@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import styled from "styled-components";
 import Arena from "./components/gameplay/Arena";
 import HomePage from "./components/home/HomePage";
 import Home from "./components/home/Home";
@@ -12,28 +11,19 @@ function App() {
     <BrowserRouter>
       <Navbar />
       
-      <AppWrapper>
-        <Routes>
-          <Route path="/" element={<HomePage />}>
-            <Route index element={<Home />} />
-            <Route path="/tutorial" element={<Tutorial />} />
-            <Route path="/rooms" element={<Rooms />} />
-          </Route>
+      <Routes>
+        <Route path="/" element={<HomePage />}>
+          <Route index element={<Home />} />
+          <Route path="/tutorial" element={<Tutorial />} />
+          <Route path="/rooms" element={<Rooms />} />
+        </Route>
 
-          <Route path="/arena" element={<Arena />}>
-            <Route path="/arena/:roomId" element={<Arena />}/>
-          </Route>
-        </Routes>
-      </AppWrapper>
+        <Route path="/arena" element={<Arena />}>
+          <Route path="/arena/:roomId" element={<Arena />}/>
+        </Route>
+      </Routes>
     </BrowserRouter>
   )
 }
 
-export default App
-
-const AppWrapper = styled.div`
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
+export default App;
