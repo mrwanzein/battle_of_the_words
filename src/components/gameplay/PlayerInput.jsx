@@ -26,6 +26,7 @@ const PlayerInput = ({
 }) => {
     const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
+    const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     const dispatch = useDispatch();
     const currentInputObj = playerObj.inputTargets[`input_${inputInstanceNumber}`];
@@ -98,7 +99,7 @@ const PlayerInput = ({
                             color: "white"
                         }}
                     >
-                        120
+                        15
                     </div>
                 }
                 animateDrawing={0.3}
@@ -204,7 +205,7 @@ const PlayerInput = ({
                             color: "white"
                         }}
                     >
-                        120
+                        15
                     </div>
                 }
                 animateDrawing={0.3}
@@ -267,7 +268,7 @@ const PlayerInput = ({
         const inEnglishDictionary = englishDictionary[word];
         const alreadyAttacking = currentInputObj.active;
         const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputTargets).find(targetObj => targetObj.target === currentInputObj.target && targetObj.active);
-        const wordToDefend = currentInputObj.wordToDefend
+        const wordToDefend = currentInputObj.wordToDefend;
 
         if (word === "") {
             setInputError("input can not be empty");
@@ -295,7 +296,7 @@ const PlayerInput = ({
         }
 
         if (alreadyAttacking && !currentInputObj.active) {
-            setInputError("this target is already used");
+            setInputError("this input is already in use");
             return true;
         }
 
@@ -304,10 +305,15 @@ const PlayerInput = ({
             return true;
         }
 
+        if (isInOnlineBattle && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
+            setInputError("this target is already in a duel");
+            return true;
+        }
+
         if (inputAlreadyHaveError) setInputError(false);
         return false;
     }
-    
+
     return (
         <>
             {
