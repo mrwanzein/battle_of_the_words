@@ -11,9 +11,10 @@ const initialInputObj = {
 }
 
 const initialState = {
+    battleCounter: 3,
     isInOnlineBattle: false,
     playerOne: {
-        hitPoints: 1000,
+        hitPoints: 60,
         inputTargets: {
             "input_1": initialInputObj,
             "input_2": initialInputObj,
@@ -24,7 +25,8 @@ const initialState = {
         usedWords: {}
     },
     playerTwo: {
-        hitPoints: 1000,
+        isReadyForOnlineBattle: false,
+        hitPoints: 60,
         inputTargets: {
             "input_1": initialInputObj,
             "input_2": initialInputObj,
@@ -97,6 +99,12 @@ export const gameSlice = createSlice({
             
             state[attacker].inputTargets[`input_${attacker_input_id}`] = initialInputObj;
             state[oppositePlayer].inputTargets[`input_${attacked_input_id}`] = initialInputObj;
+        },
+        setIsReadyForOnlineBattle: (state, action) => {
+            state.playerTwo.isReadyForOnlineBattle = action.payload;
+        },
+        setBattleCounter: (state, action) => {
+            state.battleCounter = action.payload;
         }
     }
 })
@@ -108,7 +116,9 @@ export const {
     setInputDuel,
     setArrowToDefendId,
     endInputDuel,
-    setIsInOnlineBattle
+    setIsInOnlineBattle,
+    setIsReadyForOnlineBattle,
+    setBattleCounter
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

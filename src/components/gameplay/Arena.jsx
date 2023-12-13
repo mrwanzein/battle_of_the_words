@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Xwrapper } from 'react-xarrows';
 import { useNavigate, useParams } from 'react-router-dom';
+import { socket } from '../../services/socket';
 import PlayerArea from './PlayerArea';
 import styled from 'styled-components';
+import BattleCounter from '../misc/BattleCounter';
 
 const Arena = () => {
     const playerOne = useSelector(state => state.gameState.playerOne);
@@ -11,9 +13,13 @@ const Arena = () => {
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     
     const [activeArrows, setActiveArrows] = useState([]);
+    const [bothPlayerReady, setBothPlayerReady] = useState(false);
 
     const { roomId } = useParams();
     const navigate = useNavigate();
+
+    // remove for production?
+    const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
         const isInRoomThatExists = currentRoom && currentRoom[1].id === roomId;
@@ -22,6 +28,13 @@ const Arena = () => {
             navigate("/");
         }
 
+        if (skippedFirstRenderOfDoubleRender.current) {
+            socket.on("players are ready to battle online", () => {
+                setBothPlayerReady(true);
+            });
+        }
+
+        return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
 
     return (
@@ -31,11 +44,18 @@ const Arena = () => {
                     playerObj={playerOne}
                     playerRole={"playerOne"}
                     setActiveArrows={setActiveArrows}
+                    bothPlayerReady={bothPlayerReady}
                 />
+                
+                {
+                    bothPlayerReady ? <BattleCounter /> : null
+                }
+                
                 <PlayerArea 
                     playerObj={playerTwo}
                     playerRole={"playerTwo"}
                     setActiveArrows={setActiveArrows}
+                    bothPlayerReady={bothPlayerReady}
                 />
             </Wrapper>
 

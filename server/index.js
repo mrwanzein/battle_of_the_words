@@ -48,7 +48,12 @@ io.on('connection', (socket) => {
             await socket.join(roomName);
             
             if (!activeRooms[roomName]) {
-                activeRooms[roomName] = {owner: socket.id, id: generateRoomId(), participants: [socket.id], [socket.id]: {}}
+                activeRooms[roomName] = {
+                    owner: socket.id,
+                    id: generateRoomId(),
+                    participants: [socket.id],
+                    [socket.id]: {isReady: false}
+                }
             } else {
                 throw new Error("room already exists");
             }
@@ -78,12 +83,19 @@ io.on('connection', (socket) => {
     });
 
     socket.on("join battle room", async (roomName, callback) => {
+        const thisRoom = activeRooms[roomName];
+        
         try {
             await socket.join(roomName);
             
-            if (activeRooms[roomName]) {
-                activeRooms[roomName].participants.push(socket.id);
-                activeRooms[roomName][socket.id] = {};
+            
+            if (thisRoom) {
+                thisRoom.participants.push(socket.id);
+                thisRoom[socket.id] = {isReady: false};
+                
+                if (thisRoom.participants.length === 2) {
+                    socket.to(roomName).emit("opponent has joined");
+                }
             } else {
                 throw new Error("room doesn't exists");
             }
@@ -209,6 +221,29 @@ io.on('connection', (socket) => {
     socket.on("clear old attacking word", ({attacked_input_id, roomName}, callback) => {
         try {
             socket.to(roomName).emit("clear old attacking word", {attacked_input_id});
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
+    socket.on("player is ready", ({roomName}, callback) => {
+        const thisRoom = activeRooms[roomName];
+        const participants = thisRoom.participants;
+
+        thisRoom[socket.id].isReady = true;
+        
+        try {
+            socket.to(roomName).emit("player is ready");
+            
+            if (participants.length === 2 && thisRoom[participants[0]].isReady && thisRoom[participants[1]].isReady) {
+                io.to(roomName).emit("players are ready to battle online");
+            }
 
             callback({
                 status: "ok"

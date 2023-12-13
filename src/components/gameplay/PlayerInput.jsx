@@ -103,6 +103,7 @@ const PlayerInput = ({
                     </div>
                 }
                 animateDrawing={0.3}
+                color={`${playerRole === "playerTwo" ? "red" : "blue"}`}
             />
         ]);
 
@@ -306,6 +307,11 @@ const PlayerInput = ({
         }
 
         if (isInOnlineBattle && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
+            setInputError("this target is already in a duel");
+            return true;
+        }
+
+        if (oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
             setInputError("this target is already in a duel");
             return true;
         }
