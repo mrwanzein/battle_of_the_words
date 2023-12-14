@@ -1,4 +1,3 @@
-export const calculatePercentageLengthOfDefendingWord = (currentInputLength, wordToDefendLength) => {
-    const percentage = Math.round((currentInputLength / wordToDefendLength) * 100);
-    return percentage >= 100 ? 100 : percentage;
+export const calculatePercentage = (val1, val2) => {
+    return Math.round((val1 / val2) * 100);
 }

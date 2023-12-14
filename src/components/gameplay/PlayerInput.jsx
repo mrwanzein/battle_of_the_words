@@ -8,7 +8,7 @@ import {
     endInputDuel,
     setPlayerInputToTarget
 } from "../../redux/features/game/gameSlice";
-import { calculatePercentageLengthOfDefendingWord } from "../../utils";
+import { calculatePercentage } from "../../utils";
 import { useXarrow } from "react-xarrows";
 import { socket } from "../../services/socket";
 import Xarrow from "react-xarrows"
@@ -352,7 +352,7 @@ const PlayerInput = ({
                         currentInputObj.status === "defending" &&
                         <WordHUDWrapper>
                             <WordLengthTrackingBar
-                                trackingPercentage={calculatePercentageLengthOfDefendingWord(inputVal.length, currentInputObj.wordToDefend.length)}
+                                trackingPercentage={calculatePercentage(inputVal.length, currentInputObj.wordToDefend.length)}
                             />
                             <span>{inputVal.length}</span>
                         </WordHUDWrapper>

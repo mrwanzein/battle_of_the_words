@@ -3,7 +3,7 @@ import styled from "styled-components";
 const WordLengthTrackingBar = ({ trackingPercentage }) => {
     return (
         <ParentWrapper>
-            <TrackingBar $trackingPercentage={trackingPercentage}></TrackingBar>
+            <TrackingBar $trackingPercentage={trackingPercentage} />
         </ParentWrapper>
     )
 }
@@ -18,8 +18,9 @@ const ParentWrapper = styled.div`
 
 const TrackingBar = styled.div`
     height: inherit;
-    width: ${({ $trackingPercentage }) => $trackingPercentage}%;
+    width: ${({ $trackingPercentage }) => $trackingPercentage >= 100 ? 100 : $trackingPercentage}%;
     background-color: ${({ $trackingPercentage }) => {
+        $trackingPercentage = $trackingPercentage >= 100 ? 100 : $trackingPercentage;
         let color = "#fc2803";
         
         if ($trackingPercentage >= 50) color = "#fca503";

@@ -29,7 +29,6 @@ const WordsAreaWrapper = styled.div`
     align-items: center;
     margin: 25px 0;
     box-shadow: 0px 0px 8px -3px #000000;
-    width: 100%;
     border-radius: 6px;
     height: 200px;
     overflow-y: scroll;

@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { GenericButton } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
 import { setIsReadyForOnlineBattle } from "../../redux/features/game/gameSlice";
+import { calculatePercentage } from "../../utils";
 import styled from "styled-components";
 import UsedWordsTracker from "../usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
-
- // TODO: add animation announcing opponent has joined?
+import PlayerHpBar from "../misc/PlayerHpBar";
 
 const PlayerArea = ({
     playerObj,
@@ -105,22 +105,35 @@ const PlayerArea = ({
                 }
 
                 <AwaitingPlayersToBeReady $battleCounter={isInOnlineBattle ? battleCounter : -1}>
-                    <UsedWordsTracker
-                        playerObj={playerObj}
-                        playerRole={playerRole}
-                    />
-
-                    {
-                        Array(5).fill(null).map((_, index) => 
-                            <PlayerInput
-                                key={`${playerRole}_input_${index + 1}`}
-                                playerRole={playerRole}
+                    <HpBarWrapper>
+                        {
+                            playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, 60)} /> : null
+                        }
+                        
+                        <ColumnWrapper>
+                            <UsedWordsTracker
                                 playerObj={playerObj}
-                                inputInstanceNumber={index + 1}
-                                setActiveArrows={setActiveArrows}
+                                playerRole={playerRole}
                             />
-                        )
-                    }
+
+                            {
+                                Array(5).fill(null).map((_, index) => 
+                                    <PlayerInput
+                                        key={`${playerRole}_input_${index + 1}`}
+                                        playerRole={playerRole}
+                                        playerObj={playerObj}
+                                        inputInstanceNumber={index + 1}
+                                        setActiveArrows={setActiveArrows}
+                                    />
+                                )
+                            }
+
+                        </ColumnWrapper>
+                        
+                        {
+                            playerRole === "playerTwo" ? <PlayerHpBar onTheRight playerHpInPercent={calculatePercentage(playerObj.hitPoints, 60)} /> : null
+                        }
+                    </HpBarWrapper>
                 </AwaitingPlayersToBeReady>
             </Wrapper>
         </>
@@ -135,6 +148,17 @@ const Wrapper = styled.div`
     align-items: center;
     flex-direction: column;
     margin: 0 200px; 
+`
+
+const HpBarWrapper = styled.div`
+    display: flex;
+`
+
+const ColumnWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 `
 
 const ReadyButton = styled(GenericButton)`
