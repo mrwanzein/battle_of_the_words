@@ -12,6 +12,9 @@ const BattleCounter = () => {
 
     useEffect(() => {
         if (skippedFirstRenderOfDoubleRender.current) {
+            const countDownAudio = new Audio("/src/assets/sounds/3_2_1_go.wav");
+            countDownAudio.play();
+
             const counterIntervalId = setInterval(() => {
                 setCounter(prev => {
                     --prev;

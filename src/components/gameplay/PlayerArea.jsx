@@ -22,12 +22,19 @@ const PlayerArea = ({
     const dispatch = useDispatch();
     const [isPlayerReady, setIsPlayerReady] = useState(false);
     const [opponentJoinedRoom, setOpponentJoinedRoom] = useState(currentRoom && currentRoom[1].participants.length === 2);
+    const [canShakeButton, setCanShakeButton] = useState(false);
 
     // remove for production?
     const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
         if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
+            if (opponentJoinedRoom) {
+                const getReady = new Audio("/src/assets/sounds/getReady.mp3");
+                getReady.play();
+                setCanShakeButton(true);
+            }
+            
             socket.on("player is ready", () => {
                 if (playerRole === "playerTwo") {
                     dispatch(setIsReadyForOnlineBattle(true));
@@ -36,6 +43,9 @@ const PlayerArea = ({
             });
 
             socket.on("opponent has joined", () => {
+                const getReady = new Audio("/src/assets/sounds/playerHasJoinedGetReady.mp3");
+                getReady.play();
+                setCanShakeButton(true);
                 setOpponentJoinedRoom(true);
             });
         }
@@ -71,10 +81,10 @@ const PlayerArea = ({
             <Wrapper>
                 {
                     !bothPlayerReady && isInOnlineBattle && playerRole === "playerOne" ?
-                    <ReadyButton onClick={playerIsReady} disabled={isPlayerReady || !opponentJoinedRoom}>
+                    <ReadyButton onClick={playerIsReady} disabled={isPlayerReady || !opponentJoinedRoom} $canPlay={canShakeButton}>
                         {
                             !opponentJoinedRoom ? "Waiting for opponent to join..." :
-                            isPlayerReady ? "Alright!" : "Are you ready?"
+                            isPlayerReady ? "Alright!" : "Press to get ready!"
                         }
                     </ReadyButton>
                     : null
@@ -100,8 +110,6 @@ const PlayerArea = ({
                         playerRole={playerRole}
                     />
 
-                    <p style={{fontSize: "1.3em"}}>HP: {playerObj.hitPoints} <span>{playerObj.hitPoints <= 0 ? "You lose!" : null}</span></p>
-                    
                     {
                         Array(5).fill(null).map((_, index) => 
                             <PlayerInput
@@ -130,8 +138,35 @@ const Wrapper = styled.div`
 `
 
 const ReadyButton = styled(GenericButton)`
+    @keyframes shake {
+        25% {
+            margin-left: -15px;
+        }
+
+        50% {
+            margin-left: 15px;
+        }
+
+        75% {
+            margin-right: 15px;
+        }
+
+        100% {
+            margin-right: -15px;
+        }
+    }
+    
     width: 100%;
     margin-bottom: 15px;
+    border-bottom: 7px solid #045ba8;
+    animation-name: ${({$canPlay}) => $canPlay ? "shake" : "null"};
+    animation-duration: .4s;
+    animation-iteration-count: 5;
+    animation-timing-function: linear;
+
+    &:active {
+        border-bottom: 4px solid #045ba8;
+    }
 
     // TODO: double check for 768px bug
     @media only screen and (max-height: 768px) {

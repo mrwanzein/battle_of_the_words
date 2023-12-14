@@ -210,6 +210,7 @@ const PlayerInput = ({
                     </div>
                 }
                 animateDrawing={0.3}
+                color={`${playerRole === "playerTwo" ? "red" : "blue"}`}
             />
         ]);
         
@@ -263,7 +264,7 @@ const PlayerInput = ({
         }
     }
 
-    const checkInputErrors = (word) => {
+    const checkInputErrors = (word, playerStatus) => {
         const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
         const inputAlreadyHaveError = inputError;
         const inEnglishDictionary = englishDictionary[word];
@@ -276,7 +277,7 @@ const PlayerInput = ({
             return true;
         }
 
-        if (currentInputObj.status === "defending" && wordToDefend[wordToDefend.length - 1] !== word[0]) {
+        if (playerStatus === "defending" && wordToDefend[wordToDefend.length - 1] !== word[0]) {
             setInputError("word must be shiritori");
             return true;
         }
@@ -306,12 +307,12 @@ const PlayerInput = ({
             return true;
         }
 
-        if (isInOnlineBattle && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
+        if (isInOnlineBattle && playerStatus === "attacking" && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
             setInputError("this target is already in a duel");
             return true;
         }
 
-        if (oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
+        if (playerStatus === "attacking" && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
             setInputError("this target is already in a duel");
             return true;
         }
@@ -378,7 +379,7 @@ const PlayerInput = ({
                                 const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
                                 const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
 
-                                if (!checkInputErrors(inputtedWord)) {
+                                if (!checkInputErrors(inputtedWord, playerStatus)) {
                                     dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
                                     setInputVal("");
                                     
