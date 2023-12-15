@@ -13,24 +13,28 @@ const PlayerTargetInput = ({ playerRole, inputNumber, playerObj, isInOnlineBattl
             value={currentTargetInput.target}
             onChange={e => {
                 const targetVal = e.target.value;
-                socket.timeout(3000).emit("send input target update", {targetVal, inputNumber, roomName: currentRoom}, (err, res) => {
-                    if (err) {
-                        console.log('fatal error');
-                    } else {
-                        // TODO: finish this
-                        switch(res.status) {
-                            case "ok":
-                                
-                                break;
-                            case "error":
-                                console.log('error');
-                                break;
-                            case "warning":
-                                break;
-                            default:
+
+                if (playerObj.isInOnlineBattle) {
+                    socket.timeout(3000).emit("send input target update", {targetVal, inputNumber, roomName: currentRoom}, (err, res) => {
+                        if (err) {
+                            console.log('fatal error');
+                        } else {
+                            // TODO: finish this
+                            switch(res.status) {
+                                case "ok":
+                                    
+                                    break;
+                                case "error":
+                                    console.log('error');
+                                    break;
+                                case "warning":
+                                    break;
+                                default:
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
                 dispatch(setPlayerInputToTarget({player: playerRole, selectedInput: inputNumber, target: targetVal}));
             }}
             disabled={currentTargetInput.active || playerRole === "playerTwo" && isInOnlineBattle}

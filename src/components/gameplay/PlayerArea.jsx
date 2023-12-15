@@ -18,6 +18,7 @@ const PlayerArea = ({
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
     const battleCounter = useSelector(state => state.gameState.battleCounter);
+    const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
     
     const dispatch = useDispatch();
     const [isPlayerReady, setIsPlayerReady] = useState(false);
@@ -104,7 +105,15 @@ const PlayerArea = ({
                     : null
                 }
 
-                <AwaitingPlayersToBeReady $battleCounter={isInOnlineBattle ? battleCounter : -1}>
+                <AwaitingPlayersToBeReady $battleCounter={isInOnlineBattle ? battleCounter : -1} $playerHp={playerObj.hitPoints}>
+                    {
+                        playerObj.hitPoints <= 0 ? <WinOrLoseSign>Defeated!</WinOrLoseSign> : null
+                    }
+
+                    {
+                        playerRole === "playerOne" && oppositePlayer.hitPoints <= 0 ? <WinOrLoseSign $winOrLose="win">You Win!</WinOrLoseSign> : null
+                    }
+                    
                     <HpBarWrapper>
                         {
                             playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, 60)} /> : null
@@ -199,5 +208,16 @@ const ReadyButton = styled(GenericButton)`
 `
 
 const AwaitingPlayersToBeReady = styled.div`
+    position: relative;
     pointer-events: ${({$battleCounter}) => $battleCounter <= 0 ? "auto" : "none"};
+    opacity: ${({$playerHp}) => $playerHp <= 0 ? ".4" : "1"};
+`
+
+const WinOrLoseSign = styled.span`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(8, 6);
+    color: ${({$winOrLose}) => $winOrLose === "win" ? "#32f932" : "red"};
+    text-shadow: 0px 0px 1px black;
 `
