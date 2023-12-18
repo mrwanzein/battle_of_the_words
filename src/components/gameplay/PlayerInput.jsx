@@ -227,9 +227,16 @@ const PlayerInput = ({
             
             arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
             if (arrowTimerDiv.innerText < 0) {
-                if (inputInstanceFromServer === inputInstanceNumber) setInputVal("");
-                setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
                 clearInterval(arrowTimerId);
+                
+                if (inputInstanceFromServer === inputInstanceNumber) setInputVal("");
+
+                if (playerObj.hitPoints <= 0) {
+                    setActiveArrows([]);
+                } else {
+                    setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
+                }
+
                 dispatch(decrementHitPoints({player: "playerOne", amount: inputtedWord.length}));
                 dispatch(endInputDuel({attacker: "playerTwo", attacker_input_id: inputInstanceFromServer, attacked_input_id}));
             }

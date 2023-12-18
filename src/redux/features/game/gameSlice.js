@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+export const PLAYER_MAX_HP = 10;
+
 const initialInputObj = {
     target: "1",
     active: false,
@@ -14,7 +16,7 @@ const initialState = {
     battleCounter: 3,
     isInOnlineBattle: false,
     playerOne: {
-        hitPoints: 60,
+        hitPoints: PLAYER_MAX_HP,
         inputTargets: {
             "input_1": initialInputObj,
             "input_2": initialInputObj,
@@ -26,7 +28,7 @@ const initialState = {
     },
     playerTwo: {
         isReadyForOnlineBattle: false,
-        hitPoints: 60,
+        hitPoints: PLAYER_MAX_HP,
         inputTargets: {
             "input_1": initialInputObj,
             "input_2": initialInputObj,
@@ -43,6 +45,12 @@ export const gameSlice = createSlice({
     name: "gameState",
     initialState,
     reducers: {
+        resetState: () => {
+            return {
+                ...initialState,
+                isInOnlineBattle: true
+            };
+        },
         setIsInOnlineBattle: (state, action) => {
             state.isInOnlineBattle = action.payload;
         },
@@ -103,8 +111,8 @@ export const gameSlice = createSlice({
         setIsReadyForOnlineBattle: (state, action) => {
             state.playerTwo.isReadyForOnlineBattle = action.payload;
         },
-        setBattleCounter: (state, action) => {
-            state.battleCounter = action.payload;
+        decrementBattleCounter: (state) => {
+            state.battleCounter--;
         }
     }
 })
@@ -118,7 +126,8 @@ export const {
     endInputDuel,
     setIsInOnlineBattle,
     setIsReadyForOnlineBattle,
-    setBattleCounter
+    decrementBattleCounter,
+    resetState
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

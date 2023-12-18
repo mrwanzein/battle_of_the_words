@@ -1,32 +1,29 @@
-import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
-import { setBattleCounter } from "../../redux/features/game/gameSlice";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { decrementBattleCounter } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 
 const BattleCounter = () => {
-    const [counter, setCounter] = useState(3);
+    const battleCounter = useSelector(state => state.gameState.battleCounter);
     const dispatch = useDispatch();
 
     // remove for production?
     const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
+        let innerCounter = 3;
+        
         if (skippedFirstRenderOfDoubleRender.current) {
             const countDownAudio = new Audio("/src/assets/sounds/3_2_1_go.wav");
             countDownAudio.play();
 
             const counterIntervalId = setInterval(() => {
-                setCounter(prev => {
-                    --prev;
-
-                    dispatch(setBattleCounter(prev));
-                    
-                    if (prev <= -1) {
-                        clearInterval(counterIntervalId);
-                    }
-
-                    return prev;
-                });
+                dispatch(decrementBattleCounter());
+                innerCounter--; 
+                
+                if (innerCounter <= -1) {
+                    clearInterval(counterIntervalId);
+                }
             }, 1000);
         }
 
@@ -36,7 +33,7 @@ const BattleCounter = () => {
     return (
         <>
             {
-                counter <= -1 ? null : <Counter>{counter <= 0 ? "GO!" : counter}</Counter>
+                battleCounter <= -1 ? null : <Counter>{battleCounter <= 0 ? "GO!" : battleCounter}</Counter>
             }
         </>
     )

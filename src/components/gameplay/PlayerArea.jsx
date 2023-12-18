@@ -4,6 +4,7 @@ import { GenericButton } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
 import { setIsReadyForOnlineBattle } from "../../redux/features/game/gameSlice";
 import { calculatePercentage } from "../../utils";
+import { PLAYER_MAX_HP } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 import UsedWordsTracker from "../usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
@@ -48,6 +49,13 @@ const PlayerArea = ({
                 getReady.play();
                 setCanShakeButton(true);
                 setOpponentJoinedRoom(true);
+            });
+
+            socket.on("both player ready for rematch", () => {
+                const getReady = new Audio("/src/assets/sounds/getReady.mp3");
+                
+                setIsPlayerReady(false);
+                getReady.play();
             });
         }
 
@@ -111,12 +119,12 @@ const PlayerArea = ({
                     }
 
                     {
-                        playerRole === "playerOne" && oppositePlayer.hitPoints <= 0 ? <WinOrLoseSign $winOrLose="win">You Win!</WinOrLoseSign> : null
+                        oppositePlayer.hitPoints <= 0 ? <WinOrLoseSign $winOrLose="win">Winner!</WinOrLoseSign> : null
                     }
                     
                     <HpBarWrapper>
                         {
-                            playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, 60)} /> : null
+                            playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, PLAYER_MAX_HP)} /> : null
                         }
                         
                         <ColumnWrapper>
@@ -140,7 +148,7 @@ const PlayerArea = ({
                         </ColumnWrapper>
                         
                         {
-                            playerRole === "playerTwo" ? <PlayerHpBar onTheRight playerHpInPercent={calculatePercentage(playerObj.hitPoints, 60)} /> : null
+                            playerRole === "playerTwo" ? <PlayerHpBar onTheRight playerHpInPercent={calculatePercentage(playerObj.hitPoints, PLAYER_MAX_HP)} /> : null
                         }
                     </HpBarWrapper>
                 </AwaitingPlayersToBeReady>
@@ -215,9 +223,11 @@ const AwaitingPlayersToBeReady = styled.div`
 
 const WinOrLoseSign = styled.span`
     position: absolute;
-    top: 50%;
+    top: 55%;
     left: 50%;
     transform: translate(-50%, -50%) scale(8, 6);
     color: ${({$winOrLose}) => $winOrLose === "win" ? "#32f932" : "red"};
     text-shadow: 0px 0px 1px black;
+    background: #2f2f2f;
+    padding: 2px;
 `

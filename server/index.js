@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
                     owner: socket.id,
                     id: generateRoomId(),
                     participants: [socket.id],
-                    [socket.id]: {isReady: false}
+                    [socket.id]: {isReady: false, rematch: false}
                 }
             } else {
                 throw new Error("room already exists");
@@ -242,7 +242,34 @@ io.on('connection', (socket) => {
             socket.to(roomName).emit("player is ready");
             
             if (participants.length === 2 && thisRoom[participants[0]].isReady && thisRoom[participants[1]].isReady) {
+                thisRoom[participants[0]].isReady = false;
+                thisRoom[participants[1]].isReady = false;
                 io.to(roomName).emit("players are ready to battle online");
+            }
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
+    socket.on("player wants rematch", ({roomName}, callback) => {
+        const thisRoom = activeRooms[roomName];
+        const participants = thisRoom.participants;
+
+        thisRoom[socket.id].rematch = true;
+        
+        try {
+            socket.to(roomName).emit("player wants rematch");
+
+            if (thisRoom[participants[0]].rematch && thisRoom[participants[1]].rematch) {
+                thisRoom[participants[0]].rematch = false;
+                thisRoom[participants[1]].rematch = false;
+                io.to(roomName).emit("both player ready for rematch");
             }
 
             callback({

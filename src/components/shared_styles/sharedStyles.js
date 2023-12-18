@@ -65,6 +65,7 @@ export const JoinRoomButtonGeneric = styled.button`
 	padding:16px 31px;
 	text-decoration:none;
 	text-shadow:0px 1px 0px #2f6627;
+    border-bottom: 4px solid #198e27;
 
     &:hover {
         opacity: .7;
@@ -73,6 +74,7 @@ export const JoinRoomButtonGeneric = styled.button`
     &:active {
         position: relative;
 	    top: 1px;
+        border-bottom: 2px solid #198e27;
     }
 
     &:disabled {
