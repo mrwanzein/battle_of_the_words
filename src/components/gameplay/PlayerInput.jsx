@@ -14,7 +14,7 @@ import { socket } from "../../services/socket";
 import Xarrow from "react-xarrows"
 import WordInputErrors from "../errors/WordInputErrors";
 import PlayerTargetInput from "./PlayerTargetInput";
-import englishDictionary from "../../../english_words_dictionary.json";
+import { formattedEnglishDictionary } from "../../../english_dictionary";
 import styled from "styled-components";
 import WordLengthTrackingBar from "../misc/WordLengthTrackingBar";
 
@@ -274,7 +274,7 @@ const PlayerInput = ({
     const checkInputErrors = (word, playerStatus) => {
         const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
         const inputAlreadyHaveError = inputError;
-        const inEnglishDictionary = englishDictionary[word];
+        const inEnglishDictionary = formattedEnglishDictionary[word];
         const alreadyAttacking = currentInputObj.active;
         const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputTargets).find(targetObj => targetObj.target === currentInputObj.target && targetObj.active);
         const wordToDefend = currentInputObj.wordToDefend;
