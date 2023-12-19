@@ -23,9 +23,9 @@ const GenericModal = ({ modalIsOpen, onCloseModalFn, children }) => {
             onRequestClose={onCloseModalFn}
             style={modalStyles}
         >
-            <XButtonWrapper>
+            <div>
                 <XButton onClick={onCloseModalFn}><RxCross2 size={"1.5em"} /></XButton>
-            </XButtonWrapper>
+            </div>
 
             {children}
         </Modal>
@@ -33,10 +33,6 @@ const GenericModal = ({ modalIsOpen, onCloseModalFn, children }) => {
 }
 
 export default GenericModal;
-
-const XButtonWrapper = styled.div`
-    margin-bottom: 10px;
-`
 
 const XButton = styled.button`
     margin-bottom: 10px;

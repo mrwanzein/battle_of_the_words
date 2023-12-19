@@ -6,6 +6,7 @@ import { socket } from '../../services/socket';
 import { GenericButton } from '../shared_styles/sharedStyles';
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { resetState } from '../../redux/features/game/gameSlice';
+import { HiArrowLongRight, HiArrowLongLeft } from "react-icons/hi2";
 import PlayerArea from './PlayerArea';
 import styled from 'styled-components';
 import BattleCounter from '../misc/BattleCounter';
@@ -41,6 +42,7 @@ const Arena = () => {
             socket.on("both player ready for rematch", () => {
                 dispatch(resetState());
                 setBothPlayerReady(false);
+                setHasPressedRematchOnline({local: false, opponent: false});
             });
 
             socket.on("player wants rematch", () => {
@@ -98,7 +100,39 @@ const Arena = () => {
                     {
                         bothPlayerReady ? <BattleCounter /> : null
                     }
-                    
+
+                    {
+                        playerOne.hitPoints <= 0 ?
+                        <WinnerSign>
+                            <WinnerText>Player 2 wins!</WinnerText>
+                            <CrownIcon>👑</CrownIcon>
+                            <HiArrowLongRight
+                                style={{
+                                    transform: "scale(13.5, 7)",
+                                    alignSelf: "center",
+                                    marginTop: "50px"
+                                }}
+                            />
+                        </WinnerSign> :
+                        null
+                    }
+
+                    {
+                        playerTwo.hitPoints <= 0 ?
+                        <WinnerSign>
+                            <WinnerText>Player 1 wins!</WinnerText>
+                            <CrownIcon>👑</CrownIcon>
+                            <HiArrowLongLeft
+                                style={{
+                                    transform: "scale(13.5, 7)",
+                                    alignSelf: "center",
+                                    marginTop: "50px"
+                                }}
+                            />
+                        </WinnerSign> :
+                        null
+                    }
+
                     <PlayerArea 
                         playerObj={playerTwo}
                         playerRole={"playerTwo"}
@@ -150,4 +184,20 @@ const RematchButton = styled(GenericButton)`
     @media only screen and (max-height: 768px) {
         margin-top: 25px;
     }
+`
+
+const WinnerSign = styled.div`
+    display: flex;
+    flex-direction: column;
+`
+
+const WinnerText = styled.span`
+    text-wrap: nowrap;
+    font-size: 2em;
+`
+
+const CrownIcon = styled.span`
+    align-self: center;
+    margin-top: 25px;
+    transform: scale(2.5);
 `

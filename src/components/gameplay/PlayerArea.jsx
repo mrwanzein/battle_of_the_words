@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GenericButton } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
-import { setIsReadyForOnlineBattle } from "../../redux/features/game/gameSlice";
+import { setIsReadyForOnlineBattle, decrementHitPoints } from "../../redux/features/game/gameSlice";
 import { calculatePercentage } from "../../utils";
 import { PLAYER_MAX_HP } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 import UsedWordsTracker from "../usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 import PlayerHpBar from "../misc/PlayerHpBar";
+import GenericModal from "../modals/GenericModal";
 
 const PlayerArea = ({
     playerObj,
@@ -25,6 +26,7 @@ const PlayerArea = ({
     const [isPlayerReady, setIsPlayerReady] = useState(false);
     const [opponentJoinedRoom, setOpponentJoinedRoom] = useState(currentRoom && currentRoom[1].participants.length === 2);
     const [canShakeButton, setCanShakeButton] = useState(false);
+    const [surrenderModalOpen, setSurrenderModalOpen] = useState(false);
 
     // remove for production?
     const skippedFirstRenderOfDoubleRender = useRef(false);
@@ -57,6 +59,12 @@ const PlayerArea = ({
                 setIsPlayerReady(false);
                 getReady.play();
             });
+
+            socket.on("opponent has surrendered", () => {
+                if (playerRole === "playerTwo") {
+                    dispatch(decrementHitPoints({player: "playerTwo", amount: playerObj.hitPoints}));
+                }
+            });
         }
 
         return () => skippedFirstRenderOfDoubleRender.current = true;
@@ -85,9 +93,37 @@ const PlayerArea = ({
         });
     }
 
+    const surrenderOnlineMatch = () => {
+        dispatch(decrementHitPoints({player: "playerOne", amount: oppositePlayer.hitPoints}));
+        
+        socket.timeout(3000).emit("opponent has surrendered", {roomName: currentRoom[0]}, (err, res) => {
+            if (err) {
+                console.log('fatal error');
+            } else {
+                // TODO: finish this
+                switch(res.status) {
+                    case "ok":
+                        
+                        break;
+                    case "error":
+                        console.log('error');
+                        break;
+                    case "warning":
+                        break;
+                    default:
+                }
+            }
+        });
+
+        setSurrenderModalOpen(false);
+    }
+
     return (
         <>
-            <Wrapper>
+            <Wrapper
+                $playerHp={playerObj.hitPoints}
+                $oppositePlayerHp={oppositePlayer.hitPoints}
+            >
                 {
                     !bothPlayerReady && isInOnlineBattle && playerRole === "playerOne" ?
                     <ReadyButton onClick={playerIsReady} disabled={isPlayerReady || !opponentJoinedRoom} $canPlay={canShakeButton}>
@@ -113,15 +149,11 @@ const PlayerArea = ({
                     : null
                 }
 
-                <AwaitingPlayersToBeReady $battleCounter={isInOnlineBattle ? battleCounter : -1} $playerHp={playerObj.hitPoints}>
-                    {
-                        playerObj.hitPoints <= 0 ? <WinOrLoseSign>Defeated!</WinOrLoseSign> : null
-                    }
-
-                    {
-                        oppositePlayer.hitPoints <= 0 ? <WinOrLoseSign $winOrLose="win">Winner!</WinOrLoseSign> : null
-                    }
-                    
+                <AwaitingPlayersToBeReady
+                    $battleCounter={isInOnlineBattle ? battleCounter : -1}
+                    $playerHp={playerObj.hitPoints}
+                    $oppositePlayerHp={oppositePlayer.hitPoints}
+                >
                     <HpBarWrapper>
                         {
                             playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, PLAYER_MAX_HP)} /> : null
@@ -152,7 +184,22 @@ const PlayerArea = ({
                         }
                     </HpBarWrapper>
                 </AwaitingPlayersToBeReady>
+
+                <ForfeitButton onClick={() => setSurrenderModalOpen(true)} $playerRole={playerRole}>surrender &nbsp;&#128128;</ForfeitButton>
             </Wrapper>
+
+            <GenericModal
+                modalIsOpen={surrenderModalOpen}
+                onCloseModalFn={() => {
+                    setSurrenderModalOpen(false)
+                }}
+            >
+                <SurrenderConfirmationText>Are you sure?</SurrenderConfirmationText>
+                <SurrenderModalWrapper>
+                    <YesNoSurrenderButton onClick={surrenderOnlineMatch}>Yes</YesNoSurrenderButton>
+                    <YesNoSurrenderButton onClick={() => setSurrenderModalOpen(false)}>No</YesNoSurrenderButton>
+                </SurrenderModalWrapper>
+            </GenericModal>
         </>
     )
 }
@@ -164,7 +211,7 @@ const Wrapper = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin: 0 200px; 
+    margin: 0 ${({$playerHp, $oppositePlayerHp}) => $playerHp <= 0 || $oppositePlayerHp <= 0 ? 150 : 200}px; 
 `
 
 const HpBarWrapper = styled.div`
@@ -215,19 +262,40 @@ const ReadyButton = styled(GenericButton)`
     }
 `
 
+const ForfeitButton = styled(GenericButton)`
+    background: red;
+    width: 100%;
+    margin-top: 30px;
+    font-size: 1.3em;
+    padding-bottom: 14px;
+    visibility: ${({$playerRole}) => $playerRole === "playerTwo" ? "hidden" : "visible"};
+    
+    &:hover {
+        background: #d60a0a;
+    }
+`
+
 const AwaitingPlayersToBeReady = styled.div`
     position: relative;
-    pointer-events: ${({$battleCounter}) => $battleCounter <= 0 ? "auto" : "none"};
+    pointer-events: ${({$battleCounter, $playerHp, $oppositePlayerHp}) => {
+        if ($playerHp <= 0 || $oppositePlayerHp <= 0) return "none";
+        if ($battleCounter <= 0) return "auto";
+    }};
     opacity: ${({$playerHp}) => $playerHp <= 0 ? ".4" : "1"};
 `
 
-const WinOrLoseSign = styled.span`
-    position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(8, 6);
-    color: ${({$winOrLose}) => $winOrLose === "win" ? "#32f932" : "red"};
-    text-shadow: 0px 0px 1px black;
-    background: #2f2f2f;
-    padding: 2px;
+const YesNoSurrenderButton = styled(GenericButton)`
+    margin: 0 15px;
+`
+
+const SurrenderConfirmationText = styled.span`
+    align-self: center;
+    margin-bottom: 35px;
+    font-size: 1.4em;
+`
+
+const SurrenderModalWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `

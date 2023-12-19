@@ -282,6 +282,20 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on("opponent has surrendered", ({roomName}, callback) => {
+        try {
+            socket.to(roomName).emit("opponent has surrendered");
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
     socket.on("disconnect", reason => {
         for (const roomName in activeRooms) {
             const participants = activeRooms[roomName].participants;
