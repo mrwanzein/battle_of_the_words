@@ -361,7 +361,7 @@ const PlayerInput = ({
                             <WordLengthTrackingBar
                                 trackingPercentage={calculatePercentage(inputVal.length, currentInputObj.wordToDefend.length)}
                             />
-                            <span>{inputVal.length}</span>
+                            <TrackingBarNumericalFeedBack>{inputVal.length >= currentInputObj.wordToDefend.length ? "👍" : inputVal.length}</TrackingBarNumericalFeedBack>
                         </WordHUDWrapper>
                     }
                     
@@ -458,7 +458,12 @@ const StyledInput = styled.input`
 const WordHUDWrapper = styled.div`
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
     margin: 0 15px;
     margin-bottom: -10px;
+`
+
+const TrackingBarNumericalFeedBack = styled.span`
+    position: relative;
+    bottom: 2px;
 `
