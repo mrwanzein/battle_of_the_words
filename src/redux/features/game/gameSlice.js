@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const PLAYER_MAX_HP = 10;
+export const PLAYER_MAX_HP = 60;
 
 const initialInputObj = {
     target: "1",
@@ -45,10 +45,12 @@ export const gameSlice = createSlice({
     name: "gameState",
     initialState,
     reducers: {
-        resetGameState: () => {
+        resetGameState: (_, action) => {
+            const {isStillInMatch} = action.payload;
+            
             return {
                 ...initialState,
-                isInOnlineBattle: true
+                isInOnlineBattle: isStillInMatch
             };
         },
         setIsInOnlineBattle: (state, action) => {

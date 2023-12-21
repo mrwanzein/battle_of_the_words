@@ -44,7 +44,7 @@ const Navbar = () => {
             }
         });
         
-        dispatch(resetGameState());
+        dispatch(resetGameState({isStillInMatch: false}));
         dispatch(resetRoomState());
         setConfirmLeavingMatchOpen(false);
         navigate("/");

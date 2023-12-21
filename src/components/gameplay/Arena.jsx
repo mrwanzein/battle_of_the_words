@@ -44,7 +44,7 @@ const Arena = () => {
             });
 
             socket.on("both player want rematch", () => {
-                dispatch(resetGameState());
+                dispatch(resetGameState({isStillInMatch: true}));
                 setBothPlayerReady(false);
                 setHasPressedRematchOnline({local: false, opponent: false});
             });
@@ -112,7 +112,7 @@ const Arena = () => {
             setBothPlayerReady(false);
         }
         
-        dispatch(resetGameState());
+        dispatch(resetGameState({isStillInMatch: false}));
         
         if (isInOnlineBattle) {
             navigate("/rooms");
