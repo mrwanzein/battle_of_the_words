@@ -45,7 +45,7 @@ export const gameSlice = createSlice({
     name: "gameState",
     initialState,
     reducers: {
-        resetState: () => {
+        resetGameState: () => {
             return {
                 ...initialState,
                 isInOnlineBattle: true
@@ -127,7 +127,7 @@ export const {
     setIsInOnlineBattle,
     setIsReadyForOnlineBattle,
     decrementBattleCounter,
-    resetState
+    resetGameState
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

@@ -88,13 +88,12 @@ io.on('connection', (socket) => {
         try {
             await socket.join(roomName);
             
-            
             if (thisRoom) {
                 thisRoom.participants.push(socket.id);
                 thisRoom[socket.id] = {isReady: false};
                 
                 if (thisRoom.participants.length === 2) {
-                    socket.to(roomName).emit("opponent has joined");
+                    io.to(roomName).emit("opponent has joined", {updatedRoomInfo: [roomName, thisRoom]});
                 }
             } else {
                 throw new Error("room doesn't exists");
@@ -269,7 +268,7 @@ io.on('connection', (socket) => {
             if (thisRoom[participants[0]].rematch && thisRoom[participants[1]].rematch) {
                 thisRoom[participants[0]].rematch = false;
                 thisRoom[participants[1]].rematch = false;
-                io.to(roomName).emit("both player ready for rematch");
+                io.to(roomName).emit("both player want rematch");
             }
 
             callback({
@@ -285,6 +284,34 @@ io.on('connection', (socket) => {
     socket.on("opponent has surrendered", ({roomName}, callback) => {
         try {
             socket.to(roomName).emit("opponent has surrendered");
+
+            callback({
+                status: "ok"
+            });
+        } catch (e) {
+            callback({
+                status: "error"
+            });
+        }
+    });
+
+    socket.on("player has left the match", ({roomName}, callback) => {
+        const thisRoom = activeRooms[roomName];
+
+        if (thisRoom.participants.length === 2) {
+            thisRoom.participants = thisRoom.participants.filter(participant => participant !== socket.id);
+            thisRoom.owner = thisRoom.participants[0];
+            delete thisRoom[socket.id];
+        } else {
+            delete activeRooms[roomName];
+        }
+        
+        const updatedRooms = Object.entries(activeRooms);
+
+        try {
+            socket.to(roomName).emit("player has left the match", {updatedRoomState: [roomName, thisRoom]});
+            socket.leave(roomName);
+            io.emit("auto refresh rooms", updatedRooms);
 
             callback({
                 status: "ok"

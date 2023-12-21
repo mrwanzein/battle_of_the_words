@@ -8,14 +8,18 @@ export const roomSlice = createSlice({
     name: "roomState",
     initialState,
     reducers: {
-        addRoomInfo: (state, action) => {
+        updateRoomInfo: (state, action) => {
             state.currentRoom = action.payload;
+        },
+        resetRoomState: () => {
+            return initialState;
         }
     }
 })
 
 export const {
-    addRoomInfo
+    updateRoomInfo,
+    resetRoomState
 } = roomSlice.actions;
 
 export default roomSlice.reducer;

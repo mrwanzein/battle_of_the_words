@@ -93,3 +93,20 @@ export const GenericIconButton = styled.button`
         cursor: default;
     }
 `
+
+export const ToastXButton = styled.button`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 70%;
+    border: none;
+    color: white;
+    background: #00000036;
+    cursor: pointer;
+    padding: 7px 7px;
+    font-size: 0.6em;
+
+    &:hover {
+        background: #0000005e;
+    }
+`

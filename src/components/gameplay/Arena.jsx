@@ -5,20 +5,24 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { socket } from '../../services/socket';
 import { GenericButton } from '../shared_styles/sharedStyles';
 import { IoIosCheckmarkCircle } from "react-icons/io";
-import { resetState } from '../../redux/features/game/gameSlice';
+import { resetGameState } from '../../redux/features/game/gameSlice';
 import { HiArrowLongRight, HiArrowLongLeft } from "react-icons/hi2";
+import { updateRoomInfo, resetRoomState } from '../../redux/features/rooms/roomSlice';
 import PlayerArea from './PlayerArea';
 import styled from 'styled-components';
 import BattleCounter from '../misc/BattleCounter';
+import SimpleYesNoModal from '../modals/SimpleYesNoModal';
 
 const Arena = () => {
     const playerOne = useSelector(state => state.gameState.playerOne);
     const playerTwo = useSelector(state => state.gameState.playerTwo);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
-    
+    const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
+
     const [activeArrows, setActiveArrows] = useState([]);
     const [bothPlayerReady, setBothPlayerReady] = useState(false);
     const [hasPressedRematchOnline, setHasPressedRematchOnline] = useState({local: false, opponent: false});
+    const [confirmLeavingMatchOpen, setConfirmLeavingMatchOpen] = useState(false);
 
     const { roomId } = useParams();
     const navigate = useNavigate();
@@ -39,14 +43,19 @@ const Arena = () => {
                 setBothPlayerReady(true);
             });
 
-            socket.on("both player ready for rematch", () => {
-                dispatch(resetState());
+            socket.on("both player want rematch", () => {
+                dispatch(resetGameState());
                 setBothPlayerReady(false);
                 setHasPressedRematchOnline({local: false, opponent: false});
             });
 
             socket.on("player wants rematch", () => {
                 setHasPressedRematchOnline(prev => ({...prev, opponent: true}));
+            });
+
+            socket.on("player has left the match", ({updatedRoomState}) => {
+                dispatch(updateRoomInfo(updatedRoomState));
+                setBothPlayerReady(false);
             });
         }
 
@@ -56,31 +65,71 @@ const Arena = () => {
     const onClickRematch = () => {
         setHasPressedRematchOnline(prev => ({...prev, local: true}));
 
-        socket.timeout(3000).emit("player wants rematch", {roomName: currentRoom[0]}, (err, res) => {
-            if (err) {
-                console.log('fatal error');
-            } else {
-                // TODO: finish this
-                switch(res.status) {
-                    case "ok":
-                        
-                        break;
-                    case "error":
-                        console.log('error');
-                        break;
-                    case "warning":
-                        break;
-                    default:
+        if (isInOnlineBattle) {
+            socket.timeout(3000).emit("player wants rematch", {roomName: currentRoom[0]}, (err, res) => {
+                if (err) {
+                    console.log('fatal error');
+                } else {
+                    // TODO: finish this
+                    switch(res.status) {
+                        case "ok":
+                            
+                            break;
+                        case "error":
+                            console.log('error');
+                            break;
+                        case "warning":
+                            break;
+                        default:
+                    }
                 }
-            }
-        });
+            });
+        }
+    }
+
+    const onClickLeaveRoom = () => {
+        if (isInOnlineBattle) {
+            socket.timeout(3000).emit("player has left the match", {roomName: currentRoom[0]}, (err, res) => {
+                if (err) {
+                    console.log('fatal error');
+                } else {
+                    // TODO: finish this
+                    switch(res.status) {
+                        case "ok":
+                            
+                            break;
+                        case "error":
+                            console.log('error');
+                            break;
+                        case "warning":
+                            break;
+                        default:
+                    }
+                }
+            });
+            
+            dispatch(resetRoomState());
+            setBothPlayerReady(false);
+        }
+        
+        dispatch(resetGameState());
+        
+        if (isInOnlineBattle) {
+            navigate("/rooms");
+        } else {
+            navigate("/");
+        }
+        
+        setConfirmLeavingMatchOpen(false);
     }
 
     return (
         <Xwrapper>
             <Wrapper>
+                <LeaveRoomButton onClick={() => setConfirmLeavingMatchOpen(true)}>Leave room</LeaveRoomButton>
+
                 {
-                    playerOne.hitPoints <= 0 || playerTwo.hitPoints <= 0 ?
+                    (playerOne.hitPoints <= 0 || playerTwo.hitPoints <= 0) && currentRoom[1].participants.length === 2 ?
                     <RematchWrapper>
                         <IoIosCheckmarkCircle style={{marginRight: "20px", fill: hasPressedRematchOnline.local ? "lightgreen" : "#2f2f2f4a"}} size={"2.3em"} />
                         <RematchButton onClick={onClickRematch}>Rematch?</RematchButton>
@@ -145,6 +194,13 @@ const Arena = () => {
             {
                 activeArrows.map(arrowComponent => arrowComponent)
             }
+
+            <SimpleYesNoModal
+                modalIsOpen={confirmLeavingMatchOpen}
+                confirmationText={"Are you sure you want to leave the match?"}
+                theYesFunction={onClickLeaveRoom}
+                theNoFunction={() => setConfirmLeavingMatchOpen(false)}
+            />
         </Xwrapper>
     )
 }
@@ -155,10 +211,6 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: column;
-
-    @media only screen and (min-height: 768px) {
-        height: calc(100% - 80px);
-    }
 `
 
 const PlayerAreaWrapper = styled.div`
@@ -179,6 +231,27 @@ const RematchButton = styled(GenericButton)`
 
     &:active {
         border-bottom: 4px solid #045ba8;
+    }
+
+    @media only screen and (max-height: 768px) {
+        margin-top: 25px;
+    }
+`
+
+const LeaveRoomButton = styled(GenericButton)`
+    border-bottom: 3px solid lightgrey;
+    width: 150px;
+    margin: 25px 30px 40px 30px;
+    background: red;
+    padding-bottom: 10px;
+    align-self: center;
+
+    &:active {
+        border-bottom: 1px solid lightgrey;
+    }
+
+    &:hover {
+        background: #c90404;
     }
 
     @media only screen and (max-height: 768px) {

@@ -3,7 +3,7 @@ import { GenericButton, GenericIconButton } from "../shared_styles/sharedStyles"
 import { socket } from "../../services/socket";
 import { FiRefreshCw } from "react-icons/fi";
 import { useDispatch } from "react-redux";
-import { addRoomInfo } from "../../redux/features/rooms/roomSlice";
+import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
 import { setIsInOnlineBattle } from "../../redux/features/game/gameSlice";
 import ErrorModal from "../modals/ErrorModal";
@@ -108,7 +108,7 @@ const Rooms = () => {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomNameInput);
                         dispatch(setIsInOnlineBattle(true));
-                        dispatch(addRoomInfo(joinedRoom));
+                        dispatch(updateRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);
                         break;

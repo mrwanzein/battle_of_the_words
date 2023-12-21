@@ -2,7 +2,7 @@ import { useState } from "react";
 import { JoinRoomButtonGeneric } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
 import { useDispatch } from "react-redux";
-import { addRoomInfo } from "../../redux/features/rooms/roomSlice";
+import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
 import { setIsInOnlineBattle } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
@@ -26,7 +26,7 @@ const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner })
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomName);
                         dispatch(setIsInOnlineBattle(true));
-                        dispatch(addRoomInfo(joinedRoom));
+                        dispatch(updateRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
                         refreshRooms(res.rooms);
                         break;

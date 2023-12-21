@@ -5,11 +5,15 @@ import { socket } from "../../services/socket";
 import { setIsReadyForOnlineBattle, decrementHitPoints } from "../../redux/features/game/gameSlice";
 import { calculatePercentage } from "../../utils";
 import { PLAYER_MAX_HP } from "../../redux/features/game/gameSlice";
+import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
+import toast from 'react-hot-toast';
 import styled from "styled-components";
 import UsedWordsTracker from "../usedWords/UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 import PlayerHpBar from "../misc/PlayerHpBar";
-import GenericModal from "../modals/GenericModal";
+import SimpleYesNoModal from "../modals/SimpleYesNoModal";
+
+const getReady = new Audio("/src/assets/sounds/getReady.mp3");
 
 const PlayerArea = ({
     playerObj,
@@ -23,6 +27,7 @@ const PlayerArea = ({
     const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
     
     const dispatch = useDispatch();
+    
     const [isPlayerReady, setIsPlayerReady] = useState(false);
     const [opponentJoinedRoom, setOpponentJoinedRoom] = useState(currentRoom && currentRoom[1].participants.length === 2);
     const [canShakeButton, setCanShakeButton] = useState(false);
@@ -33,12 +38,6 @@ const PlayerArea = ({
 
     useEffect(() => {
         if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
-            if (opponentJoinedRoom) {
-                const getReady = new Audio("/src/assets/sounds/getReady.mp3");
-                getReady.play();
-                setCanShakeButton(true);
-            }
-            
             socket.on("player is ready", () => {
                 if (playerRole === "playerTwo") {
                     dispatch(setIsReadyForOnlineBattle(true));
@@ -46,16 +45,14 @@ const PlayerArea = ({
                 }
             });
 
-            socket.on("opponent has joined", () => {
-                const getReady = new Audio("/src/assets/sounds/playerHasJoinedGetReady.mp3");
+            socket.on("opponent has joined", ({updatedRoomInfo}) => {
                 getReady.play();
+                if (currentRoom[1].participants.length === 1) dispatch(updateRoomInfo(updatedRoomInfo))
                 setCanShakeButton(true);
                 setOpponentJoinedRoom(true);
             });
 
-            socket.on("both player ready for rematch", () => {
-                const getReady = new Audio("/src/assets/sounds/getReady.mp3");
-                
+            socket.on("both player want rematch", () => {
                 setIsPlayerReady(false);
                 getReady.play();
             });
@@ -64,6 +61,14 @@ const PlayerArea = ({
                 if (playerRole === "playerTwo") {
                     dispatch(decrementHitPoints({player: "playerTwo", amount: playerObj.hitPoints}));
                 }
+            });
+
+            socket.on("player has left the match", () => {
+                    toast.error("Player has left the room", {duration: 5000});
+                    if (playerObj.hitPoints > 0 || oppositePlayer.hitPoints > 0) dispatch(decrementHitPoints({player: "playerTwo", amount: playerObj.hitPoints}));
+                    dispatch(setIsReadyForOnlineBattle(false));
+                    setOpponentJoinedRoom(false);
+                    setIsPlayerReady(false);
             });
         }
 
@@ -96,24 +101,26 @@ const PlayerArea = ({
     const surrenderOnlineMatch = () => {
         dispatch(decrementHitPoints({player: "playerOne", amount: oppositePlayer.hitPoints}));
         
-        socket.timeout(3000).emit("opponent has surrendered", {roomName: currentRoom[0]}, (err, res) => {
-            if (err) {
-                console.log('fatal error');
-            } else {
-                // TODO: finish this
-                switch(res.status) {
-                    case "ok":
-                        
-                        break;
-                    case "error":
-                        console.log('error');
-                        break;
-                    case "warning":
-                        break;
-                    default:
+        if (isInOnlineBattle) {
+            socket.timeout(3000).emit("opponent has surrendered", {roomName: currentRoom[0]}, (err, res) => {
+                if (err) {
+                    console.log('fatal error');
+                } else {
+                    // TODO: finish this
+                    switch(res.status) {
+                        case "ok":
+                            
+                            break;
+                        case "error":
+                            console.log('error');
+                            break;
+                        case "warning":
+                            break;
+                        default:
+                    }
                 }
-            }
-        });
+            });
+        }
 
         setSurrenderModalOpen(false);
     }
@@ -185,21 +192,21 @@ const PlayerArea = ({
                     </HpBarWrapper>
                 </AwaitingPlayersToBeReady>
 
-                <ForfeitButton onClick={() => setSurrenderModalOpen(true)} $playerRole={playerRole}>surrender &nbsp;&#128128;</ForfeitButton>
+                <ForfeitButton
+                    onClick={() => setSurrenderModalOpen(true)}
+                    $playerRole={playerRole}
+                    disabled={playerObj.hitPoints <= 0 || oppositePlayer.hitPoints <= 0}
+                >
+                    surrender &nbsp;&#128128;
+                </ForfeitButton>
             </Wrapper>
 
-            <GenericModal
+            <SimpleYesNoModal
                 modalIsOpen={surrenderModalOpen}
-                onCloseModalFn={() => {
-                    setSurrenderModalOpen(false)
-                }}
-            >
-                <SurrenderConfirmationText>Are you sure?</SurrenderConfirmationText>
-                <SurrenderModalWrapper>
-                    <YesNoSurrenderButton onClick={surrenderOnlineMatch}>Yes</YesNoSurrenderButton>
-                    <YesNoSurrenderButton onClick={() => setSurrenderModalOpen(false)}>No</YesNoSurrenderButton>
-                </SurrenderModalWrapper>
-            </GenericModal>
+                confirmationText={"Are you sure you want to surrender?"}
+                theYesFunction={surrenderOnlineMatch}
+                theNoFunction={() => setSurrenderModalOpen(false)}
+            />
         </>
     )
 }
@@ -278,24 +285,8 @@ const ForfeitButton = styled(GenericButton)`
 const AwaitingPlayersToBeReady = styled.div`
     position: relative;
     pointer-events: ${({$battleCounter, $playerHp, $oppositePlayerHp}) => {
-        if ($playerHp <= 0 || $oppositePlayerHp <= 0) return "none";
+        if ($playerHp <= 0 || $oppositePlayerHp <= 0 || $battleCounter > 0) return "none";
         if ($battleCounter <= 0) return "auto";
     }};
     opacity: ${({$playerHp}) => $playerHp <= 0 ? ".4" : "1"};
-`
-
-const YesNoSurrenderButton = styled(GenericButton)`
-    margin: 0 15px;
-`
-
-const SurrenderConfirmationText = styled.span`
-    align-self: center;
-    margin-bottom: 35px;
-    font-size: 1.4em;
-`
-
-const SurrenderModalWrapper = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
 `
