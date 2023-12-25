@@ -272,7 +272,7 @@ const ReadyButton = styled(GenericButton)`
 const ForfeitButton = styled(GenericButton)`
     background: red;
     width: 100%;
-    margin-top: 30px;
+    margin: 30px 0;
     font-size: 1.3em;
     padding-bottom: 14px;
     visibility: ${({$playerRole}) => $playerRole === "playerTwo" ? "hidden" : "visible"};
