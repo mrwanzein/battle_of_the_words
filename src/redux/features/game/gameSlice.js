@@ -3,7 +3,6 @@ import { createSlice } from "@reduxjs/toolkit";
 export const PLAYER_MAX_HP = 60;
 
 const initialInputObj = {
-    target: "1",
     active: false,
     status: "attacking",
     attackingWord: null,
@@ -17,7 +16,9 @@ const initialState = {
     isInOnlineBattle: false,
     playerOne: {
         hitPoints: PLAYER_MAX_HP,
-        inputTargets: {
+        currentTarget: null,
+        opponentsTarget: null,
+        inputControls: {
             "input_1": initialInputObj,
             "input_2": initialInputObj,
             "input_3": initialInputObj,
@@ -29,7 +30,9 @@ const initialState = {
     playerTwo: {
         isReadyForOnlineBattle: false,
         hitPoints: PLAYER_MAX_HP,
-        inputTargets: {
+        currentTarget: null,
+        opponentsTarget: null,
+        inputControls: {
             "input_1": initialInputObj,
             "input_2": initialInputObj,
             "input_3": initialInputObj,
@@ -61,10 +64,11 @@ export const gameSlice = createSlice({
             state[player].hitPoints -= amount;
         },
         setPlayerInputToTarget: (state, action) => {
-            const {player, selectedInput, target} = action.payload;
-            const playerInput = state[player].inputTargets[`input_${selectedInput}`];
+            const {player, target} = action.payload;
+            const oppositePlayer = player === "playerOne" ? "playerTwo" : "playerOne";
 
-            playerInput.target = target;
+            state[player].currentTarget = target;
+            state[oppositePlayer].opponentsTarget = target;
         },
         addWordToUsedWord: (state, action) => {
             const {player, word} = action.payload;
@@ -81,8 +85,8 @@ export const gameSlice = createSlice({
                 attackerArrowId
             } = action.payload;
             const oppositePlayer = attacker === "playerOne" ? "playerTwo" : "playerOne";
-            const attackingPlayer = state[attacker].inputTargets[`input_${attacker_input_id}`];
-            const defendingPlayer = state[oppositePlayer].inputTargets[`input_${attacked_input_id}`];
+            const attackingPlayer = state[attacker].inputControls[`input_${attacker_input_id}`];
+            const defendingPlayer = state[oppositePlayer].inputControls[`input_${attacked_input_id}`];
 
             attackingPlayer.active = true;
             attackingPlayer.status = "attacking";
@@ -92,12 +96,12 @@ export const gameSlice = createSlice({
             defendingPlayer.status = "defending";
             defendingPlayer.wordToDefend = word;
             defendingPlayer.arrowToDefendId = attackerArrowId;
-            defendingPlayer.target = attacker_input_id;
+            defendingPlayer.currentTarget = attacker_input_id;
         },
         setArrowToDefendId: (state, action) => {
             const {defender, arrowTimerId, attacker_input_id} = action.payload;
 
-            state[defender].inputTargets[`input_${attacker_input_id}`].arrowToDefendTimerId = arrowTimerId;
+            state[defender].inputControls[`input_${attacker_input_id}`].arrowToDefendTimerId = arrowTimerId;
         },
         endInputDuel: (state, action) => {
             const {
@@ -107,8 +111,8 @@ export const gameSlice = createSlice({
             } = action.payload;
             const oppositePlayer = attacker === "playerOne" ? "playerTwo" : "playerOne";
             
-            state[attacker].inputTargets[`input_${attacker_input_id}`] = initialInputObj;
-            state[oppositePlayer].inputTargets[`input_${attacked_input_id}`] = initialInputObj;
+            state[attacker].inputControls[`input_${attacker_input_id}`] = initialInputObj;
+            state[oppositePlayer].inputControls[`input_${attacked_input_id}`] = initialInputObj;
         },
         setIsReadyForOnlineBattle: (state, action) => {
             state.playerTwo.isReadyForOnlineBattle = action.payload;

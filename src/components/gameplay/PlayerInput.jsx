@@ -13,9 +13,8 @@ import { useXarrow } from "react-xarrows";
 import { socket } from "../../services/socket";
 import Xarrow from "react-xarrows"
 import WordInputErrors from "../errors/WordInputErrors";
-import PlayerTargetInput from "./PlayerTargetInput";
 import { formattedEnglishDictionary } from "../../../english_dictionary";
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import WordLengthTrackingBar from "../misc/WordLengthTrackingBar";
 
 const PlayerInput = ({
@@ -29,7 +28,7 @@ const PlayerInput = ({
     const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     const dispatch = useDispatch();
-    const currentInputObj = playerObj.inputTargets[`input_${inputInstanceNumber}`];
+    const currentInputObj = playerObj.inputControls[`input_${inputInstanceNumber}`];
 
     useXarrow();
 
@@ -57,12 +56,6 @@ const PlayerInput = ({
                 if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
                     dispatch(addWordToUsedWord({player: "playerTwo", word: inputtedWord}));
                     invokeBattleOnline(attacked_input_id, inputtedWord, inputInstanceFromServer, oldArrowToDelete, playerStatus);
-                }
-            });
-
-            socket.on("update target input", ({targetVal, inputInstanceFromServer}) => {
-                if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
-                    dispatch(setPlayerInputToTarget({player: "playerTwo", selectedInput: inputInstanceFromServer, target: targetVal}))
                 }
             });
 
@@ -271,12 +264,18 @@ const PlayerInput = ({
         }
     }
 
+    const targetInputWithClick = () => {
+        if (isInOnlineBattle && playerRole === "playerTwo") {
+            dispatch(setPlayerInputToTarget({player: "playerOne", target: inputInstanceNumber}));
+        }
+    }
+
     const checkInputErrors = (word, playerStatus) => {
         const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
         const inputAlreadyHaveError = inputError;
         const inEnglishDictionary = formattedEnglishDictionary[word];
         const alreadyAttacking = currentInputObj.active;
-        const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputTargets).find(targetObj => targetObj.target === currentInputObj.target && targetObj.active);
+        const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputControls).find((targetObj, i) => i === playerObj.currentTarget - 1 && targetObj.active);
         const wordToDefend = currentInputObj.wordToDefend;
 
         if (word === "") {
@@ -314,12 +313,17 @@ const PlayerInput = ({
             return true;
         }
 
-        if (isInOnlineBattle && playerStatus === "attacking" && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
+        if (!playerObj.currentTarget) {
+            setInputError("choose a target!");
+            return true;
+        }
+
+        if (isInOnlineBattle && playerStatus === "attacking" && oppositePlayer.inputControls[`input_${playerObj.currentTarget}`].active) {
             setInputError("this target is already in a duel");
             return true;
         }
 
-        if (playerStatus === "attacking" && oppositePlayer.inputTargets[`input_${currentInputObj.target}`].active) {
+        if (playerStatus === "attacking" && oppositePlayer.inputControls[`input_${playerObj.currentTarget}`].active) {
             setInputError("this target is already in a duel");
             return true;
         }
@@ -335,16 +339,6 @@ const PlayerInput = ({
             }
 
             <InputWrapper>
-                {
-                    playerRole === "playerOne" &&
-                    <PlayerTargetInput
-                        inputNumber={inputInstanceNumber}
-                        playerRole={playerRole}
-                        playerObj={playerObj}
-                        currentRoom={isInOnlineBattle && currentRoom[0]}
-                    />
-                }
-
                 <div>
                     {
                         currentInputObj.active &&
@@ -366,23 +360,26 @@ const PlayerInput = ({
                     }
                     
                     <StyledInput
+                        $targeted={playerObj.opponentsTarget === inputInstanceNumber && playerRole === "playerTwo"}
+                        $playerTwoOnline={isInOnlineBattle && playerRole === "playerTwo"}
                         type="text"
                         id={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
                         value={inputVal}
                         onChange={showToOpponentTypingWords}
+                        onClick={targetInputWithClick}
                         placeholder={
                             currentInputObj.active &&
                             currentInputObj.status === "defending" &&
                             currentInputObj.wordToDefend ?
                             currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
                         }
-                        disabled={currentInputObj.active && currentInputObj.status === "attacking" || isInOnlineBattle && playerRole === "playerTwo"}
+                        readOnly={currentInputObj.active && currentInputObj.status === "attacking" || isInOnlineBattle && playerRole === "playerTwo"}
                         onKeyDown={e => {
                             if (e.code === "Enter") {
                                 const inputtedWord = e.target.value;
                                 const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
                                 const playerStatus = currentInputObj.status;
-                                const attacked_input_id = currentInputObj.target;
+                                const attacked_input_id = playerObj.currentTarget;
                                 const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
                                 const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
 
@@ -416,16 +413,6 @@ const PlayerInput = ({
                         }}
                     />
                 </div>
-
-                {
-                    playerRole === "playerTwo" &&
-                    <PlayerTargetInput
-                        inputNumber={inputInstanceNumber}
-                        playerRole={playerRole}
-                        playerObj={playerObj}
-                        isInOnlineBattle={isInOnlineBattle}
-                    />
-                }
             </InputWrapper>
         </>
     )
@@ -444,14 +431,13 @@ const StyledInput = styled.input`
     padding: 10px;
     width: 300px;
     border: 1px solid black;
-
-    &:disabled {
-        cursor: default;
-        margin: 15px;
-        padding: 10px;
-        width: 300px;
-        border: 1px solid black;
-        background: white;
+    cursor: ${({$playerTwoOnline}) => $playerTwoOnline ? "crosshair" : "initial"};
+    ${
+        ({$targeted}) => $targeted && css`
+            -webkit-box-shadow: 0px 0px 7px 2px rgba(28,98,255,0.72); 
+            box-shadow: 0px 0px 7px 2px rgba(28,98,255,0.72);
+            outline: none;
+        `
     }
 `
 

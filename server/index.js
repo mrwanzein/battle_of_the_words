@@ -202,20 +202,6 @@ io.on('connection', (socket) => {
             });
         }
     });
-    
-    socket.on("send input target update", ({targetVal, inputNumber, roomName}, callback) => {
-        try {
-            socket.to(roomName).emit("update target input", {targetVal, inputInstanceFromServer: inputNumber});
-
-            callback({
-                status: "ok"
-            });
-        } catch (e) {
-            callback({
-                status: "error"
-            });
-        }
-    });
 
     socket.on("clear old attacking word", ({attacked_input_id, roomName}, callback) => {
         try {
