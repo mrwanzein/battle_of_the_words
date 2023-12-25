@@ -33,8 +33,8 @@ const Tutorial = () => {
                     </TutorialListInstance>
 
                     <TutorialListInstance>
-                        The target input (press the input with the mouse to select a target). As you can see, you can attack multiple inputs at once.
-                        You have to be quick and accurate because it can rapidly become overwhelming.
+                        The selected target (press the input with the mouse to select a target). You can attack multiple inputs at the same time, but not the ones that
+                        are already active. You have to be quick and accurate because it can rapidly become overwhelming.
                     </TutorialListInstance>
 
                     <TutorialListInstance>

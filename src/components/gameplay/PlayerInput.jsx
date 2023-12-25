@@ -375,7 +375,7 @@ const PlayerInput = ({
                         }
                         readOnly={currentInputObj.active && currentInputObj.status === "attacking" || isInOnlineBattle && playerRole === "playerTwo"}
                         onKeyDown={e => {
-                            if (e.code === "Enter") {
+                            if (e.code === "Enter" && playerRole === "playerOne") {
                                 const inputtedWord = e.target.value;
                                 const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
                                 const playerStatus = currentInputObj.status;
