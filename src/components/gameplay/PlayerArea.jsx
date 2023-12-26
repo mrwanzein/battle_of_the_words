@@ -4,7 +4,6 @@ import { GenericButton } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
 import { setIsReadyForOnlineBattle, decrementHitPoints } from "../../redux/features/game/gameSlice";
 import { calculatePercentage } from "../../utils";
-import { PLAYER_MAX_HP } from "../../redux/features/game/gameSlice";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import toast from 'react-hot-toast';
 import styled from "styled-components";
@@ -25,6 +24,7 @@ const PlayerArea = ({
     const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
     const battleCounter = useSelector(state => state.gameState.battleCounter);
     const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
+    const attackInputAmount = useSelector(state => state.gameState.amountOfInput);
     
     const dispatch = useDispatch();
     
@@ -163,7 +163,7 @@ const PlayerArea = ({
                 >
                     <HpBarWrapper>
                         {
-                            playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, PLAYER_MAX_HP)} /> : null
+                            playerRole === "playerOne" ? <PlayerHpBar playerHpInPercent={calculatePercentage(playerObj.hitPoints, playerObj.maxHitPoints)} /> : null
                         }
                         
                         <ColumnWrapper>
@@ -173,7 +173,7 @@ const PlayerArea = ({
                             />
 
                             {
-                                Array(5).fill(null).map((_, index) => 
+                                Array(attackInputAmount).fill(null).map((_, index) => 
                                     <PlayerInput
                                         key={`${playerRole}_input_${index + 1}`}
                                         playerRole={playerRole}
@@ -183,11 +183,10 @@ const PlayerArea = ({
                                     />
                                 )
                             }
-
                         </ColumnWrapper>
                         
                         {
-                            playerRole === "playerTwo" ? <PlayerHpBar onTheRight playerHpInPercent={calculatePercentage(playerObj.hitPoints, PLAYER_MAX_HP)} /> : null
+                            playerRole === "playerTwo" ? <PlayerHpBar onTheRight playerHpInPercent={calculatePercentage(playerObj.hitPoints, playerObj.maxHitPoints)} /> : null
                         }
                     </HpBarWrapper>
                 </AwaitingPlayersToBeReady>

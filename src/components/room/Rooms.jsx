@@ -5,7 +5,7 @@ import { FiRefreshCw } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
-import { setIsInOnlineBattle } from "../../redux/features/game/gameSlice";
+import { setIsInOnlineBattle, setAmountOfInput, setMaxHealth } from "../../redux/features/game/gameSlice";
 import ErrorModal from "../modals/ErrorModal";
 import GenericModal from "../modals/GenericModal";
 import styled, { css } from "styled-components";
@@ -17,7 +17,11 @@ const Rooms = () => {
     const [socketId, setSocketId] = useState("");
     
     const [rooms, setRooms] = useState([]);
-    const [roomNameInput, setRoomNameInput] = useState("");
+    const [roomParams, setRoomParams] = useState({
+        roomName: "",
+        inputAmount: 3,
+        maxHealth: 50
+    });
     const [roomNameInputError, setRoomNameInputError] = useState(false);
     const [searchRoomNameInput, setSearchRoomNameInput] = useState("");
     
@@ -93,20 +97,24 @@ const Rooms = () => {
     const onCloseCreateRoomModal = () => {
         setCreateRoomModalOpen(false);
         setWhileCreatingRoom(false);
-        setRoomNameInput("");
+        setRoomParams({
+            roomName: "",
+            inputAmount: 3,
+            maxHealth: 50
+        });
         setRoomNameInputError(false);
     }
     
     const createRoom = () => {
         setWhileCreatingRoom(true);
 
-        socket.timeout(3000).emit("create a battle room", roomNameInput, (err, res) => {
+        socket.timeout(3000).emit("create a battle room", roomParams, (err, res) => {
             if (err) {
                 triggerErrorModal("error", "Could not connect to the server. Please try again in a moment.");
             } else {
                 switch(res.status) {
                     case "ok":
-                        const joinedRoom = res.rooms.find(room => room[0] === roomNameInput);
+                        const joinedRoom = res.rooms.find(room => room[0] === roomParams.roomName);
                         dispatch(setIsInOnlineBattle(true));
                         dispatch(updateRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
@@ -127,7 +135,7 @@ const Rooms = () => {
         });
     }
     
-    const checkInputErrors = (input) => {
+    const checkRoomNameErrors = (input) => {
         if (input.length > 40) {
             setRoomNameInputError("Please keep the room name under 40 characters");
             return true;
@@ -181,26 +189,65 @@ const Rooms = () => {
                 <RoomNameInput
                     id="roomNameInput"
                     type="text"
-                    value={roomNameInput}
+                    value={roomParams.roomName}
                     onChange={e => {
                         const input = e.target.value;
 
-                        if (!checkInputErrors(input)) {
-                            setRoomNameInput(input);
+                        if (!checkRoomNameErrors(input)) {
+                            setRoomParams(state => ({
+                                ...state,
+                                roomName: input
+                            }));
                         }
                     }}
                     onKeyDown={e => {
                         if (e.code === "Enter") {
-                            if (roomNameInput.length !== 0 && !roomNameInputError && !whileCreatingRoom) createRoom();
+                            if (roomParams.length !== 0 && !roomNameInputError && !whileCreatingRoom) createRoom();
                         }
                     }}
                     autoComplete="off"
                     autoFocus
                 />
 
+                <InputAmountLabel htmlFor="attackInputAmount">Amount of inputs <InputAmountDisplay>{roomParams.inputAmount}</InputAmountDisplay></InputAmountLabel>
+                <InputAmount
+                    id="attackInputAmount"
+                    type="range"
+                    value={roomParams.inputAmount}
+                    min={3}
+                    max={5}
+                    onChange={e => {
+                        const amount = Number(e.target.value);
+                        
+                        dispatch(setAmountOfInput(amount));
+                        setRoomParams(state => ({
+                            ...state,
+                            inputAmount: amount
+                        }));
+                    }}
+                />
+
+                <MaxHealthAmountLabel htmlFor="MaxHealthAmount">Max health <MaxHealthAmountDisplay>{roomParams.maxHealth}</MaxHealthAmountDisplay></MaxHealthAmountLabel>
+                <MaxHealthAmount
+                    id="MaxHealthAmount"
+                    type="range"
+                    value={roomParams.maxHealth}
+                    min={60}
+                    max={120}
+                    onChange={e => {
+                        const amount = Number(e.target.value);
+                        
+                        dispatch(setMaxHealth(amount));
+                        setRoomParams(state => ({
+                            ...state,
+                            maxHealth: amount
+                        }));
+                    }}
+                />
+
                 <CreateRoomButtonInModal
                     onClick={createRoom}
-                    disabled={roomNameInput.length === 0 || roomNameInputError || whileCreatingRoom}
+                    disabled={roomParams.roomName.length === 0 || roomNameInputError || whileCreatingRoom}
                 >
                     {
                         whileCreatingRoom ? <LoadingSpinner /> : "CREATE ROOM"
@@ -261,11 +308,11 @@ const RoomsWrapper = styled.div`
 `
 
 const CreateRoomButtonInModal = styled(GenericButton)`
-    margin-top: 10px;
+    margin-top: 25px;
 `
 
 const RoomNameInput = styled.input`
-    margin-top: 10px;
+    margin: 10px 0;
     padding: 12px;
     width: 300px;
     border-style: solid;
@@ -278,4 +325,28 @@ const SearchRoomNameInput = styled.input`
     border-width: 1px;
     border-radius: 5px;
     width: 200px;
+`
+
+const InputAmountLabel = styled.label`
+    margin-top: 20px;
+`
+
+const InputAmount = styled.input`
+    margin: 15px 0;
+`
+
+const InputAmountDisplay = styled.span`
+    float: right;
+`
+
+const MaxHealthAmountLabel = styled.label`
+    margin-top: 20px;
+`
+
+const MaxHealthAmount = styled.input`
+    margin: 15px 0;
+`
+
+const MaxHealthAmountDisplay = styled.span`
+    float: right;
 `

@@ -3,7 +3,6 @@ import styled from "styled-components";
 const Tutorial = () => {
     return (
         <Wrapper>
-            <TutorialTitle>Here are the instructions about how to play the game</TutorialTitle>
             <div>
                 <h2>Goal of the game</h2>
                 <p>
@@ -67,14 +66,8 @@ const Wrapper = styled.div`
     margin: 20px;
     overflow-y: scroll;
     flex: 1;
-    padding: 15px;
+    padding: 0 15px;
     line-height: 1.75;
-`
-
-const TutorialTitle = styled.span`
-    align-self: center;
-    font-size: 1.5em;
-    margin-bottom: 15px;
 `
 
 const TutorialImg1 = styled.img`
