@@ -59,6 +59,7 @@ const PlayerArea = ({
 
             socket.on("opponent has surrendered", () => {
                 if (playerRole === "playerTwo") {
+                    toast.success("Opponent has surrendered!", {duration: 5000});
                     dispatch(decrementHitPoints({player: "playerTwo", amount: oppositePlayer.hitPoints}));
                 }
             });
@@ -194,7 +195,7 @@ const PlayerArea = ({
                 <ForfeitButton
                     onClick={() => setSurrenderModalOpen(true)}
                     $playerRole={playerRole}
-                    disabled={playerObj.hitPoints <= 0 || oppositePlayer.hitPoints <= 0}
+                    disabled={playerObj.hitPoints <= 0 || oppositePlayer.hitPoints <= 0 || battleCounter > 0}
                 >
                     surrender &nbsp;&#128128;
                 </ForfeitButton>
