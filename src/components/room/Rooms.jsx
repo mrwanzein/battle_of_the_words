@@ -5,7 +5,12 @@ import { FiRefreshCw } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
-import { setIsInOnlineBattle, setAmountOfInput, setMaxHealth } from "../../redux/features/game/gameSlice";
+import {
+    setIsInOnlineBattle,
+    setAmountOfInput,
+    setMaxHealth,
+    setWordExpireTime
+} from "../../redux/features/game/gameSlice";
 import ErrorModal from "../modals/ErrorModal";
 import GenericModal from "../modals/GenericModal";
 import styled, { css } from "styled-components";
@@ -20,7 +25,8 @@ const Rooms = () => {
     const [roomParams, setRoomParams] = useState({
         roomName: "",
         inputAmount: 3,
-        maxHealth: 50
+        maxHealth: 50,
+        wordExpireTime: 15
     });
     const [roomNameInputError, setRoomNameInputError] = useState(false);
     const [searchRoomNameInput, setSearchRoomNameInput] = useState("");
@@ -100,7 +106,8 @@ const Rooms = () => {
         setRoomParams({
             roomName: "",
             inputAmount: 3,
-            maxHealth: 50
+            maxHealth: 50,
+            wordExpireTime: 15
         });
         setRoomNameInputError(false);
     }
@@ -115,6 +122,7 @@ const Rooms = () => {
                 switch(res.status) {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomParams.roomName);
+                        
                         dispatch(setIsInOnlineBattle(true));
                         dispatch(updateRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
@@ -245,6 +253,24 @@ const Rooms = () => {
                     }}
                 />
 
+                <WordExpireTimeLabel htmlFor="WordExpireTimeAmount">Word expiration time <WordExpireTimeAmountDisplay>{roomParams.wordExpireTime}</WordExpireTimeAmountDisplay></WordExpireTimeLabel>
+                <WordExpireTimeAmount
+                    id="WordExpireTimeAmount"
+                    type="range"
+                    value={roomParams.wordExpireTime}
+                    min={5}
+                    max={25}
+                    onChange={e => {
+                        const amount = Number(e.target.value);
+                        
+                        dispatch(setWordExpireTime(amount));
+                        setRoomParams(state => ({
+                            ...state,
+                            wordExpireTime: amount
+                        }));
+                    }}
+                />
+
                 <CreateRoomButtonInModal
                     onClick={createRoom}
                     disabled={roomParams.roomName.length === 0 || roomNameInputError || whileCreatingRoom}
@@ -348,5 +374,17 @@ const MaxHealthAmount = styled.input`
 `
 
 const MaxHealthAmountDisplay = styled.span`
+    float: right;
+`
+
+const WordExpireTimeLabel = styled.label`
+    margin-top: 20px;
+`
+
+const WordExpireTimeAmount = styled.input`
+    margin: 15px 0;
+`
+
+const WordExpireTimeAmountDisplay = styled.span`
     float: right;
 `

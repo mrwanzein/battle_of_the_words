@@ -27,9 +27,10 @@ const PlayerInput = ({
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
     const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
-    const dispatch = useDispatch();
+    const wordExpireTime = useSelector(state => state.gameState.wordExpireTime);
     const currentInputObj = playerObj.inputControls[`input_${inputInstanceNumber}`];
-
+    
+    const dispatch = useDispatch();
     useXarrow();
 
     const [inputVal, setInputVal] = useState("");
@@ -92,7 +93,7 @@ const PlayerInput = ({
                             color: "white"
                         }}
                     >
-                        15
+                        {wordExpireTime}
                     </div>
                 }
                 animateDrawing={0.3}
@@ -199,7 +200,7 @@ const PlayerInput = ({
                             color: "white"
                         }}
                     >
-                        15
+                        {wordExpireTime}
                     </div>
                 }
                 animateDrawing={0.3}

@@ -14,6 +14,7 @@ const initialState = {
     battleCounter: 3,
     isInOnlineBattle: false,
     amountOfInput: 3,
+    wordExpireTime: 15,
     playerOne: {
         maxHitPoints: 50,
         hitPoints: 50,
@@ -132,6 +133,9 @@ export const gameSlice = createSlice({
             state.playerOne.hitPoints = amount;
             state.playerTwo.maxHitPoints = amount;
             state.playerTwo.hitPoints = amount;
+        },
+        setWordExpireTime: (state, action) => {
+            state.wordExpireTime = action.payload;
         }
     }
 })
@@ -148,7 +152,8 @@ export const {
     decrementBattleCounter,
     resetGameState,
     setAmountOfInput,
-    setMaxHealth
+    setMaxHealth,
+    setWordExpireTime
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

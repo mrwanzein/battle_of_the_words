@@ -4,7 +4,12 @@ import { socket } from "../../services/socket";
 import { useDispatch } from "react-redux";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import { useNavigate } from "react-router-dom";
-import { setIsInOnlineBattle, setAmountOfInput, setMaxHealth } from "../../redux/features/game/gameSlice";
+import {
+    setIsInOnlineBattle,
+    setAmountOfInput,
+    setMaxHealth,
+    setWordExpireTime
+} from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 import LoadingSpinner from "../misc/LoadingSpinner";
 
@@ -25,8 +30,10 @@ const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner })
                 switch(res.status) {
                     case "ok":
                         const joinedRoom = res.rooms.find(room => room[0] === roomName);
+                        
                         dispatch(setAmountOfInput(joinedRoom[1].roomParams.inputAmount));
                         dispatch(setMaxHealth(joinedRoom[1].roomParams.maxHealth));
+                        dispatch(setWordExpireTime(joinedRoom[1].roomParams.wordExpireTime));
                         dispatch(setIsInOnlineBattle(true));
                         dispatch(updateRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
