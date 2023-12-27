@@ -19,25 +19,26 @@ const Tutorial = () => {
                     last letter of the opponent's word and the length of the word must be equal or higher than the attacking one.
                 </p>
 
-                <p>Let's look at the image below. Under that image, the numbers will be explained.</p>
+                <p>Let's look at the image below. The numbers in the image will be explained under it.</p>
                 
                 <TutorialImg1 src="/src/assets/images/tutorialImg1.jpg" alt="image with numbers explaining how to play" />
 
                 <ol>
                     <TutorialListInstance>
-                        The input field where the words are written (press the enter key after writing a word).
+                        This is the input field where the words are written (press the enter key after selecting a target and writing a word).
                         It can be used for attacking or defending. If there's no arrow pointing to that input, it means it can attack.
                         If there is an arrow, it means its getting attacked and a duel is in motion for that specific input. The players have
                         to go back and forth until the timer on a duel arrow expires.
                     </TutorialListInstance>
 
                     <TutorialListInstance>
-                        The selected target to attack (press the opponent's input with the mouse to select). It is possible to attack multiple inputs at the same time
-                        but not the ones that are already active. It is recommended to be quick and accurate because it can rapidly become overwhelming.
+                        This is the selected target to attack (press the opponent's input with the mouse to select). <b>Don't forget to reselect your input to press enter.</b> It 
+                        is possible to attack multiple inputs at the same time but not the ones that are already active. It is <b>recommended</b> to be <b>quick</b> and <b> accurate</b> because 
+                        it can rapidly become overwhelming.
                     </TutorialListInstance>
 
                     <TutorialListInstance>
-                        The timing arrow. After attacking or defending a word, there's an arrow with a number attached to it. That number are
+                        This is the timing arrow. After attacking or defending a word, there's an arrow with a number attached to it. That number is
                         the remaining seconds left to defend. Once it expires, the defendant takes the length of the word as damage to the health bar.
                     </TutorialListInstance>
 
@@ -47,7 +48,7 @@ const Tutorial = () => {
                     </TutorialListInstance>
 
                     <TutorialListInstance>
-                        Lastly, this is the area where the used words are being tracked. Be careful, once a word is used, it cannot be used for both players. Keep
+                        Lastly, this is the area where the used words are being tracked. Be careful, once a word is used, <b>it cannot be used for both players</b>. Keep
                         an eye on both areas.
                     </TutorialListInstance>
                 </ol>

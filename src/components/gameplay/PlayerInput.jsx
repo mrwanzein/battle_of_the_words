@@ -274,8 +274,7 @@ const PlayerInput = ({
         const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
         const inputAlreadyHaveError = inputError;
         const inEnglishDictionary = formattedEnglishDictionary[word];
-        const alreadyAttacking = currentInputObj.active;
-        const targetIsAlreadyBeingAttacked = Object.values(playerObj.inputControls).find((targetObj, i) => i === playerObj.currentTarget - 1 && targetObj.active);
+        const targetIsAlreadyActive = oppositePlayer.inputControls[`input_${playerObj.currentTarget}`]?.active;
         const wordToDefend = currentInputObj.wordToDefend;
 
         if (word === "") {
@@ -303,28 +302,18 @@ const PlayerInput = ({
             return true;
         }
 
-        if (alreadyAttacking && !currentInputObj.active) {
-            setInputError("this input is already in use");
-            return true;
-        }
-
-        if (targetIsAlreadyBeingAttacked && currentInputObj.status === "attacking") {
-            setInputError("this target is already attacked");
-            return true;
-        }
-
-        if (!playerObj.currentTarget) {
+        if (!playerObj.currentTarget && !playerObj.inputControls[`input_${inputInstanceNumber}`].targetIfDefending) {
             setInputError("choose a target!");
             return true;
         }
 
-        if (isInOnlineBattle && playerStatus === "attacking" && oppositePlayer.inputControls[`input_${playerObj.currentTarget}`].active) {
-            setInputError("this target is already in a duel");
+        if (isInOnlineBattle && playerStatus === "attacking" && targetIsAlreadyActive) {
+            setInputError("the target is already in a duel");
             return true;
         }
 
-        if (playerStatus === "attacking" && oppositePlayer.inputControls[`input_${playerObj.currentTarget}`].active) {
-            setInputError("this target is already in a duel");
+        if (playerStatus === "attacking" && targetIsAlreadyActive) {
+            setInputError("the target is already in a duel");
             return true;
         }
 
@@ -379,7 +368,9 @@ const PlayerInput = ({
                                 const inputtedWord = e.target.value;
                                 const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
                                 const playerStatus = currentInputObj.status;
-                                const attacked_input_id = playerObj.currentTarget;
+                                const attacked_input_id = playerStatus === "defending" ?
+                                    playerObj.inputControls[`input_${inputInstanceNumber}`].targetIfDefending :
+                                    playerObj.currentTarget;
                                 const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
                                 const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
 

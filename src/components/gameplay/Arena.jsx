@@ -6,11 +6,10 @@ import { socket } from '../../services/socket';
 import { GenericButton } from '../shared_styles/sharedStyles';
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { resetGameState } from '../../redux/features/game/gameSlice';
-import { HiArrowLongRight, HiArrowLongLeft } from "react-icons/hi2";
 import { updateRoomInfo, resetRoomState } from '../../redux/features/rooms/roomSlice';
 import PlayerArea from './PlayerArea';
 import styled from 'styled-components';
-import BattleCounter from '../misc/BattleCounter';
+import BattleCounter from './BattleCounter';
 import SimpleYesNoModal from '../modals/SimpleYesNoModal';
 
 const Arena = () => {
@@ -153,15 +152,8 @@ const Arena = () => {
                     {
                         playerOne.hitPoints <= 0 ?
                         <WinnerSign>
-                            <WinnerText>Player 2 wins!</WinnerText>
                             <CrownIcon>👑</CrownIcon>
-                            <HiArrowLongRight
-                                style={{
-                                    transform: "scale(13.5, 7)",
-                                    alignSelf: "center",
-                                    marginTop: "50px"
-                                }}
-                            />
+                            <WinnerText>Player 2 wins!</WinnerText>
                         </WinnerSign> :
                         null
                     }
@@ -169,15 +161,8 @@ const Arena = () => {
                     {
                         playerTwo.hitPoints <= 0 ?
                         <WinnerSign>
-                            <WinnerText>Player 1 wins!</WinnerText>
                             <CrownIcon>👑</CrownIcon>
-                            <HiArrowLongLeft
-                                style={{
-                                    transform: "scale(13.5, 7)",
-                                    alignSelf: "center",
-                                    marginTop: "50px"
-                                }}
-                            />
+                            <WinnerText>Player 1 wins!</WinnerText>
                         </WinnerSign> :
                         null
                     }
@@ -271,6 +256,6 @@ const WinnerText = styled.span`
 
 const CrownIcon = styled.span`
     align-self: center;
-    margin-top: 25px;
+    margin-bottom: 25px;
     transform: scale(2.5);
 `

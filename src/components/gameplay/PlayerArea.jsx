@@ -7,9 +7,9 @@ import { calculatePercentage } from "../../utils";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import toast from 'react-hot-toast';
 import styled from "styled-components";
-import UsedWordsTracker from "../usedWords/UsedWordsTracker";
+import UsedWordsTracker from "./UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
-import PlayerHpBar from "../misc/PlayerHpBar";
+import PlayerHpBar from "./PlayerHpBar";
 import SimpleYesNoModal from "../modals/SimpleYesNoModal";
 
 const getReady = new Audio("/src/assets/sounds/getReady.mp3");
@@ -59,7 +59,7 @@ const PlayerArea = ({
 
             socket.on("opponent has surrendered", () => {
                 if (playerRole === "playerTwo") {
-                    dispatch(decrementHitPoints({player: "playerTwo", amount: playerObj.hitPoints}));
+                    dispatch(decrementHitPoints({player: "playerTwo", amount: oppositePlayer.hitPoints}));
                 }
             });
 
@@ -99,7 +99,7 @@ const PlayerArea = ({
     }
 
     const surrenderOnlineMatch = () => {
-        dispatch(decrementHitPoints({player: "playerOne", amount: oppositePlayer.hitPoints}));
+        dispatch(decrementHitPoints({player: "playerOne", amount: playerObj.hitPoints}));
         
         if (isInOnlineBattle) {
             socket.timeout(3000).emit("opponent has surrendered", {roomName: currentRoom[0]}, (err, res) => {

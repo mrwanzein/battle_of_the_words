@@ -6,7 +6,8 @@ const initialInputObj = {
     attackingWord: null,
     wordToDefend: null,
     arrowToDefendId: null,
-    arrowToDefendTimerId: null
+    arrowToDefendTimerId: null,
+    targetIfDefending: null
 }
 
 const initialState = {
@@ -97,7 +98,7 @@ export const gameSlice = createSlice({
             defendingPlayer.status = "defending";
             defendingPlayer.wordToDefend = word;
             defendingPlayer.arrowToDefendId = attackerArrowId;
-            defendingPlayer.currentTarget = attacker_input_id;
+            defendingPlayer.targetIfDefending = attacker_input_id;
         },
         setArrowToDefendId: (state, action) => {
             const {defender, arrowTimerId, attacker_input_id} = action.payload;

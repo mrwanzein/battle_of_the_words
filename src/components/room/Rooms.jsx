@@ -232,7 +232,7 @@ const Rooms = () => {
                     id="MaxHealthAmount"
                     type="range"
                     value={roomParams.maxHealth}
-                    min={60}
+                    min={50}
                     max={120}
                     onChange={e => {
                         const amount = Number(e.target.value);
