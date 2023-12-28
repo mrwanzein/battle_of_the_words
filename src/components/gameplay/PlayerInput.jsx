@@ -21,7 +21,8 @@ const PlayerInput = ({
     playerRole,
     playerObj,
     inputInstanceNumber,
-    setActiveArrows
+    setActiveArrows,
+    activeArrows
 }) => {
     const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
@@ -36,6 +37,7 @@ const PlayerInput = ({
     const [inputVal, setInputVal] = useState("");
     const [inputError, setInputError] = useState(false);
 
+    const inputRef = useRef();
     // remove for production?
     const skippedFirstRenderOfDoubleRender = useRef(false);
 
@@ -69,6 +71,17 @@ const PlayerInput = ({
 
         return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
+
+    useEffect(() => {
+        if (playerObj.hitPoints <= 0 || oppositePlayer.hitPoints <= 0) {
+            inputRef.current.blur();
+            setInputVal("");
+            setInputError(false);
+            activeArrows.forEach(arrow => {
+                document.getElementById(arrow.props.labels.props.id).innerText = 0;
+            });
+        }
+    }, [playerObj.hitPoints, oppositePlayer.hitPoints]);
 
     const invokeBattle = (
         attackerArrowKey,
@@ -105,9 +118,11 @@ const PlayerInput = ({
             const arrowTimerDiv = document.getElementById(`${playerRole}_active_arrow_timer_${inputInstanceNumber}`);
             
             arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
-            if (arrowTimerDiv.innerText < 0) {
-                setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
+            if (arrowTimerDiv.innerText <= 0) {
                 clearInterval(arrowTimerId);
+                
+                setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
+                
                 dispatch(decrementHitPoints({player: defender, amount: inputtedWord.length}));
                 dispatch(endInputDuel({attacker: playerRole, attacker_input_id: inputInstanceNumber, attacked_input_id}));
             }
@@ -220,16 +235,12 @@ const PlayerInput = ({
             const arrowTimerDiv = document.getElementById(`playerTwo_active_arrow_timer_${inputInstanceFromServer}`);
             
             arrowTimerDiv.innerText = arrowTimerDiv.innerText - 1;
-            if (arrowTimerDiv.innerText < 0) {
+            if (arrowTimerDiv.innerText <= 0) {
                 clearInterval(arrowTimerId);
                 
                 if (inputInstanceFromServer === inputInstanceNumber) setInputVal("");
 
-                if (playerObj.hitPoints <= 0) {
-                    setActiveArrows([]);
-                } else {
-                    setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
-                }
+                setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
 
                 dispatch(decrementHitPoints({player: "playerOne", amount: inputtedWord.length}));
                 dispatch(endInputDuel({attacker: "playerTwo", attacker_input_id: inputInstanceFromServer, attacked_input_id}));
@@ -352,6 +363,7 @@ const PlayerInput = ({
                     <StyledInput
                         $targeted={playerObj.opponentsTarget === inputInstanceNumber && playerRole === "playerTwo"}
                         $playerTwoOnline={isInOnlineBattle && playerRole === "playerTwo"}
+                        ref={inputRef}
                         type="text"
                         id={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
                         value={inputVal}

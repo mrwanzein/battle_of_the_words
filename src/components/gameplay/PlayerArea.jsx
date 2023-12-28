@@ -18,7 +18,8 @@ const PlayerArea = ({
     playerObj,
     playerRole,
     setActiveArrows,
-    bothPlayerReady
+    bothPlayerReady,
+    activeArrows
 }) => {
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
@@ -66,7 +67,7 @@ const PlayerArea = ({
 
             socket.on("player has left the match", () => {
                     toast.error("Player has left the room", {duration: 5000});
-                    if (playerObj.hitPoints > 0 || oppositePlayer.hitPoints > 0) dispatch(decrementHitPoints({player: "playerTwo", amount: playerObj.hitPoints}));
+                    dispatch(decrementHitPoints({player: "playerTwo", amount: oppositePlayer.hitPoints, specialCase: "player left match"}));
                     dispatch(setIsReadyForOnlineBattle(false));
                     setOpponentJoinedRoom(false);
                     setIsPlayerReady(false);
@@ -181,6 +182,7 @@ const PlayerArea = ({
                                         playerObj={playerObj}
                                         inputInstanceNumber={index + 1}
                                         setActiveArrows={setActiveArrows}
+                                        activeArrows={activeArrows}
                                     />
                                 )
                             }

@@ -51,20 +51,39 @@ export const gameSlice = createSlice({
     name: "gameState",
     initialState,
     reducers: {
-        resetGameState: (_, action) => {
-            const {isStillInMatch} = action.payload;
+        resetGameState: (state, action) => {
+            const {isStillInMatch, roomParamHealth} = action.payload;
             
             return {
                 ...initialState,
-                isInOnlineBattle: isStillInMatch
+                isInOnlineBattle: isStillInMatch,
+                amountOfInput: isStillInMatch ? state.amountOfInput : initialState.amountOfInput,
+                wordExpireTime: isStillInMatch ? state.wordExpireTime : initialState.wordExpireTime,
+                playerOne: {
+                    ...initialState.playerOne,
+                    maxHitPoints: isStillInMatch ? roomParamHealth : initialState.playerOne.maxHitPoints,
+                    hitPoints: isStillInMatch ? roomParamHealth : initialState.playerOne.hitPoints
+                },
+                playerTwo: {
+                    ...initialState.playerTwo,
+                    maxHitPoints: isStillInMatch ? roomParamHealth : initialState.playerTwo.maxHitPoints,
+                    hitPoints: isStillInMatch ? roomParamHealth : initialState.playerTwo.hitPoints
+                }
             };
         },
         setIsInOnlineBattle: (state, action) => {
             state.isInOnlineBattle = action.payload;
         },
         decrementHitPoints: (state, action) => {
-            const {player, amount} = action.payload;
-            state[player].hitPoints -= amount;
+            const {player, amount, specialCase} = action.payload;
+            
+            if (specialCase === "player left match" && state.playerOne.hitPoints < 0 || state.playerTwo.hitPoints < 0) {
+                return;
+            } else if (specialCase === "player left match" && state.playerOne.hitPoints > 0 && state.playerTwo.hitPoints > 0) {
+                state[player].hitPoints -= state.playerTwo.hitPoints;
+            } else {
+                state[player].hitPoints -= amount;
+            }
         },
         setPlayerInputToTarget: (state, action) => {
             const {player, target} = action.payload;

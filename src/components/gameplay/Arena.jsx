@@ -43,7 +43,7 @@ const Arena = () => {
             });
 
             socket.on("both player want rematch", () => {
-                dispatch(resetGameState({isStillInMatch: true}));
+                dispatch(resetGameState({isStillInMatch: true, roomParamHealth: currentRoom[1].roomParams.maxHealth}));
                 setBothPlayerReady(false);
                 setHasPressedRematchOnline({local: false, opponent: false});
             });
@@ -143,6 +143,7 @@ const Arena = () => {
                         playerRole={"playerOne"}
                         setActiveArrows={setActiveArrows}
                         bothPlayerReady={bothPlayerReady}
+                        activeArrows={activeArrows}
                     />
                     
                     {
@@ -172,6 +173,7 @@ const Arena = () => {
                         playerRole={"playerTwo"}
                         setActiveArrows={setActiveArrows}
                         bothPlayerReady={bothPlayerReady}
+                        activeArrows={activeArrows}
                     />
                 </PlayerAreaWrapper>
             </Wrapper>
