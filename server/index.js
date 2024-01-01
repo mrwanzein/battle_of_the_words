@@ -312,13 +312,15 @@ io.on('connection', (socket) => {
 
     socket.on("disconnect", reason => {
         for (const roomName in activeRooms) {
-            const participants = activeRooms[roomName].participants;
+            const thisRoom = activeRooms[roomName];
+            const participants = thisRoom.participants;
             
             if (participants.length === 1 && participants.includes(socket.id)) {
                 delete activeRooms[roomName];
             }
 
             if (participants.length === 2 && participants.includes(socket.id)) {
+                socket.to(roomName).emit("player has left the match", {updatedRoomState: [roomName, thisRoom]});
                 participants.splice(participants.indexOf(socket.id), 1);
             }
         }

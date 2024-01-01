@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GenericButton } from "../shared_styles/sharedStyles";
 import { socket } from "../../services/socket";
-import { setIsReadyForOnlineBattle, decrementHitPoints } from "../../redux/features/game/gameSlice";
+import { setIsReadyForOnlineBattle, decrementHitPoints, resetGameState } from "../../redux/features/game/gameSlice";
 import { calculatePercentage } from "../../utils";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import toast from 'react-hot-toast';
@@ -48,7 +48,8 @@ const PlayerArea = ({
 
             socket.on("opponent has joined", ({updatedRoomInfo}) => {
                 getReady.play();
-                if (currentRoom[1].participants.length === 1) dispatch(updateRoomInfo(updatedRoomInfo))
+                dispatch(updateRoomInfo(updatedRoomInfo));
+                dispatch(resetGameState({isStillInMatch: true, roomParamHealth: currentRoom[1].roomParams.maxHealth}));
                 setCanShakeButton(true);
                 setOpponentJoinedRoom(true);
             });

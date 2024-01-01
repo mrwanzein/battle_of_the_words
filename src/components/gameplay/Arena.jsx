@@ -22,6 +22,7 @@ const Arena = () => {
     const [bothPlayerReady, setBothPlayerReady] = useState(false);
     const [hasPressedRematchOnline, setHasPressedRematchOnline] = useState({local: false, opponent: false});
     const [confirmLeavingMatchOpen, setConfirmLeavingMatchOpen] = useState(false);
+    const [canSeeRematchButton, setCanSeeRematchButton] = useState(true);
 
     const { roomId } = useParams();
     const navigate = useNavigate();
@@ -40,6 +41,7 @@ const Arena = () => {
         if (skippedFirstRenderOfDoubleRender.current) {
             socket.on("players are ready to battle online", () => {
                 setBothPlayerReady(true);
+                setCanSeeRematchButton(true);
             });
 
             socket.on("both player want rematch", () => {
@@ -55,6 +57,7 @@ const Arena = () => {
             socket.on("player has left the match", ({updatedRoomState}) => {
                 dispatch(updateRoomInfo(updatedRoomState));
                 setBothPlayerReady(false);
+                setCanSeeRematchButton(false);
             });
         }
 
@@ -128,7 +131,7 @@ const Arena = () => {
                 <LeaveRoomButton onClick={() => setConfirmLeavingMatchOpen(true)}>Leave room</LeaveRoomButton>
 
                 {
-                    (playerOne.hitPoints <= 0 || playerTwo.hitPoints <= 0) && currentRoom[1].participants.length === 2 ?
+                    (playerOne.hitPoints <= 0 || playerTwo.hitPoints <= 0) && canSeeRematchButton ?
                     <RematchWrapper>
                         <IoIosCheckmarkCircle style={{marginRight: "20px", fill: hasPressedRematchOnline.local ? "lightgreen" : "#2f2f2f4a"}} size={"2.3em"} />
                         <RematchButton onClick={onClickRematch}>Rematch?</RematchButton>
