@@ -12,10 +12,19 @@ import {
 } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 import LoadingSpinner from "../misc/LoadingSpinner";
+import GenericModal from "../modals/GenericModal";
 
-const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner }) => {
+const Room = ({
+    roomName,
+    triggerErrorModal,
+    roomCount,
+    refreshRooms,
+    isOwner,
+    roomParams
+}) => {
     const [whileJoiningRoom, setWhileJoiningRoom] = useState(false);
     const [whileDeletingRoom, setWhileDeletingRoom] = useState(false);
+    const [roomInfoModalOpen, setRoomInfoModalOpen] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -83,6 +92,7 @@ const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner })
             <RoomContentWrapper>
                 <HostAndOpponentWrapper>
                     <RoomsName>{roomName}</RoomsName>
+                    <RoomInfoButton onClick={() => setRoomInfoModalOpen(true)}>Room info</RoomInfoButton>
                 </HostAndOpponentWrapper>
 
                 <ButtonsWrapperOnRoomInstance>
@@ -91,6 +101,15 @@ const Room = ({ roomName, triggerErrorModal, roomCount, refreshRooms, isOwner })
                     <JoinRoomButtonRoomsArea onClick={joinRoom} disabled={whileJoiningRoom || roomCount === 2}>{whileJoiningRoom ? <LoadingSpinner /> : "JOIN"}</JoinRoomButtonRoomsArea>
                 </ButtonsWrapperOnRoomInstance>
             </RoomContentWrapper>
+            
+            <GenericModal
+                modalIsOpen={roomInfoModalOpen}
+                onCloseModalFn={() => setRoomInfoModalOpen(false)}
+            >
+                <RoomParamText>Input amount <RoomParamSpan>{roomParams.inputAmount}</RoomParamSpan></RoomParamText>
+                <RoomParamText>Max health <RoomParamSpan>{roomParams.maxHealth} HP</RoomParamSpan></RoomParamText>
+                <RoomParamText>Word expiration time <RoomParamSpan>{roomParams.wordExpireTime}s</RoomParamSpan></RoomParamText>
+            </GenericModal>
         </RoomWrapper>
     )
 }
@@ -138,4 +157,26 @@ const RoomsName = styled.span`
 
 const PeopleInRoom = styled.span`
     margin: 0 20px;
+`
+
+const RoomInfoButton = styled.button`
+    margin-left: 5px;
+    border: 2px solid black;
+    padding: 7px;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        opacity: .7;
+    }
+`
+
+const RoomParamSpan = styled.span`
+    float: right;
+    margin-left: 50px;
+`
+
+const RoomParamText= styled.p`
+    border-bottom: 1px solid;
+    margin: 20px 0;
 `

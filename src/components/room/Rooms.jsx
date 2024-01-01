@@ -70,7 +70,8 @@ const Rooms = () => {
             owner: room[1].owner,
             roomName: room[0],
             roomId: room[1].id,
-            participants: room[1].participants
+            participants: room[1].participants,
+            roomParams: room[1].roomParams
         })) : [];
         setRooms([...roomsFromServer]);
     }
@@ -181,6 +182,7 @@ const Rooms = () => {
                             roomCount={roomObj.participants.length}
                             refreshRooms={refreshRooms}
                             isOwner={roomObj.owner === socketId}
+                            roomParams={roomObj.roomParams}
                         />) :
                     <p style={{textAlign: "center"}}>No rooms at the moment. Create one!</p>
                 }
