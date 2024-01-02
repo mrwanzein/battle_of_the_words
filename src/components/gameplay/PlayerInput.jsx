@@ -84,7 +84,8 @@ const PlayerInput = ({
             setInputError(false);
             activeArrows.forEach(arrow => {
                 const arrowElement = document.getElementById(arrow.key);
-                const arrowTimerElement = document.getElementById(arrow.props.children.props.labels.props.id)
+                const arrowTimerElement = document.getElementById(arrow.props.children.props.labels.end.props.id);
+                
                 arrowElement.style.visibility = "hidden";
                 arrowTimerElement.innerText = 0;
             });
@@ -110,19 +111,22 @@ const PlayerInput = ({
                 <Xarrow
                     start={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
                     end={`${defender}_word_attack_input_${attacked_input_id}`}
-                    labels={
-                        <div
-                            id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
-                            style={{
-                                border: "2px solid lightgrey",
-                                padding: "5px 12px",
-                                background: "#4d4d4d",
-                                color: "white"
-                            }}
-                        >
-                            {wordExpireTime}
-                        </div>
-                    }
+                    labels={{
+                        end: <div
+                                id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
+                                style={{
+                                    border: "2px solid lightgrey",
+                                    padding: "5px 12px",
+                                    background: "#4d4d4d",
+                                    color: "white",
+                                    marginBottom: "15px",
+                                    marginLeft: "5px",
+                                    marginRight: "5px"
+                                }}
+                            >
+                                {wordExpireTime}
+                            </div>
+                    }}
                     animateDrawing={0.3}
                     color={`${playerRole === "playerTwo" ? "red" : "blue"}`}
                 />
@@ -216,19 +220,22 @@ const PlayerInput = ({
                 <Xarrow
                     start={`playerTwo_word_attack_input_${inputInstanceFromServer}`}
                     end={`playerOne_word_attack_input_${attacked_input_id}`}
-                    labels={
-                        <div
-                            id={`playerTwo_active_arrow_timer_${inputInstanceFromServer}`}
-                            style={{
-                                border: "2px solid lightgrey",
-                                padding: "5px 12px",
-                                background: "#4d4d4d",
-                                color: "white"
-                            }}
-                        >
-                            {wordExpireTime}
-                        </div>
-                    }
+                    labels={{
+                        end: <div
+                                id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
+                                style={{
+                                    border: "2px solid lightgrey",
+                                    padding: "5px 12px",
+                                    background: "#4d4d4d",
+                                    color: "white",
+                                    marginBottom: "15px",
+                                    marginLeft: "5px",
+                                    marginRight: "5px"
+                                }}
+                            >
+                                {wordExpireTime}
+                            </div>
+                    }}
                     animateDrawing={0.3}
                     color={`${playerRole === "playerTwo" ? "red" : "blue"}`}
                 />
