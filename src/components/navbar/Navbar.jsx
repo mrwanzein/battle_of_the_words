@@ -6,16 +6,26 @@ import { resetRoomState } from "../../redux/features/rooms/roomSlice";
 import { socket } from "../../services/socket";
 import styled from "styled-components";
 import SimpleYesNoModal from "../modals/SimpleYesNoModal";
+import ErrorModal from "../modals/ErrorModal";
 
 const Navbar = () => {
     const gameState = useSelector(state => state.gameState);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
 
     const [confirmLeavingMatchOpen, setConfirmLeavingMatchOpen] = useState(false);
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [serverErrorType, setServerErrorType] = useState("error");
+    const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
     
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
+    const triggerErrorModal = (errorType, errorMessage) => {
+        setServerErrorType(errorType);
+        setErrorModalOpen(true);
+        setCreateRoomErrorMsg(errorMessage);
+    }
+
     const clickingGameTitle = () => {
         if (gameState.isInOnlineBattle) {
             setConfirmLeavingMatchOpen(true);
@@ -24,18 +34,16 @@ const Navbar = () => {
         }
     }
     
-    const onAccpetingLeavingMatch = () => {
+    const onAcceptingLeavingMatch = () => {
         socket.timeout(3000).emit("player has left the match", {roomName: currentRoom[0]}, (err, res) => {
             if (err) {
-                console.log('fatal error');
+                triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
             } else {
-                // TODO: finish this
                 switch(res.status) {
                     case "ok":
-                        
                         break;
                     case "error":
-                        console.log('error');
+                        triggerErrorModal("error", "There was an error in the server. Please try again in a moment.");
                         break;
                     case "warning":
                         break;
@@ -57,8 +65,15 @@ const Navbar = () => {
             <SimpleYesNoModal
                 modalIsOpen={confirmLeavingMatchOpen}
                 confirmationText={"Are you sure you want to leave the match?"}
-                theYesFunction={onAccpetingLeavingMatch}
+                theYesFunction={onAcceptingLeavingMatch}
                 theNoFunction={() => setConfirmLeavingMatchOpen(false)}
+            />
+
+            <ErrorModal
+                modalIsOpen={errorModalOpen}
+                onCloseModalFn={() => setErrorModalOpen(false)}
+                errorType={serverErrorType}
+                errorMsg={createRoomErrorMsg}
             />
         </NavDiv>
     )

@@ -32,14 +32,13 @@ const Rooms = () => {
     const [searchRoomNameInput, setSearchRoomNameInput] = useState("");
     
     const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
-    const [createRoomError, setCreateRoomError] = useState(false);
+    const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
     const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [serverErrorType, setServerErrorType] = useState("error");
     
     const [whileCreatingRoom, setWhileCreatingRoom] = useState(false);
     const [whileGettingRooms, setWhileGettingRooms] = useState(true);
     
-    const [serverErrorType, setServerErrorType] = useState("error");
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -79,7 +78,7 @@ const Rooms = () => {
     const triggerErrorModal = (errorType, errorMessage) => {
         setServerErrorType(errorType);
         setErrorModalOpen(true);
-        setCreateRoomError(errorMessage);
+        setCreateRoomErrorMsg(errorMessage);
     }
     
     const getBattleRooms = () => {
@@ -287,7 +286,7 @@ const Rooms = () => {
                 modalIsOpen={errorModalOpen}
                 onCloseModalFn={() => setErrorModalOpen(false)}
                 errorType={serverErrorType}
-                errorMsg={createRoomError}
+                errorMsg={createRoomErrorMsg}
             />
         </>
     )

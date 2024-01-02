@@ -11,6 +11,7 @@ import PlayerArea from './PlayerArea';
 import styled from 'styled-components';
 import BattleCounter from './BattleCounter';
 import SimpleYesNoModal from '../modals/SimpleYesNoModal';
+import ErrorModal from '../modals/ErrorModal';
 
 const Arena = () => {
     const playerOne = useSelector(state => state.gameState.playerOne);
@@ -23,6 +24,10 @@ const Arena = () => {
     const [hasPressedRematchOnline, setHasPressedRematchOnline] = useState({local: false, opponent: false});
     const [confirmLeavingMatchOpen, setConfirmLeavingMatchOpen] = useState(false);
     const [canSeeRematchButton, setCanSeeRematchButton] = useState(true);
+
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [serverErrorType, setServerErrorType] = useState("error");
+    const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
 
     const { roomId } = useParams();
     const navigate = useNavigate();
@@ -64,21 +69,25 @@ const Arena = () => {
         return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
 
+    const triggerErrorModal = (errorType, errorMessage) => {
+        setServerErrorType(errorType);
+        setErrorModalOpen(true);
+        setCreateRoomErrorMsg(errorMessage);
+    }
+
     const onClickRematch = () => {
         setHasPressedRematchOnline(prev => ({...prev, local: true}));
 
         if (isInOnlineBattle) {
             socket.timeout(3000).emit("player wants rematch", {roomName: currentRoom[0]}, (err, res) => {
                 if (err) {
-                    console.log('fatal error');
+                    triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
                 } else {
-                    // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            
                             break;
                         case "error":
-                            console.log('error');
+                            triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                             break;
                         case "warning":
                             break;
@@ -93,15 +102,13 @@ const Arena = () => {
         if (isInOnlineBattle) {
             socket.timeout(3000).emit("player has left the match", {roomName: currentRoom[0]}, (err, res) => {
                 if (err) {
-                    console.log('fatal error');
+                    triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
                 } else {
-                    // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            
                             break;
                         case "error":
-                            console.log('error');
+                            triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                             break;
                         case "warning":
                             break;
@@ -190,6 +197,13 @@ const Arena = () => {
                 confirmationText={"Are you sure you want to leave the match?"}
                 theYesFunction={onClickLeaveRoom}
                 theNoFunction={() => setConfirmLeavingMatchOpen(false)}
+            />
+
+            <ErrorModal
+                modalIsOpen={errorModalOpen}
+                onCloseModalFn={() => setErrorModalOpen(false)}
+                errorType={serverErrorType}
+                errorMsg={createRoomErrorMsg}
             />
         </Xwrapper>
     )

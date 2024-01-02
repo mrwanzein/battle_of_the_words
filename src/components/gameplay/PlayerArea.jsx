@@ -11,6 +11,7 @@ import UsedWordsTracker from "./UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 import PlayerHpBar from "./PlayerHpBar";
 import SimpleYesNoModal from "../modals/SimpleYesNoModal";
+import ErrorModal from "../modals/ErrorModal";
 
 const getReady = new Audio("/src/assets/sounds/getReady.mp3");
 
@@ -33,6 +34,10 @@ const PlayerArea = ({
     const [opponentJoinedRoom, setOpponentJoinedRoom] = useState(currentRoom && currentRoom[1].participants.length === 2);
     const [canShakeButton, setCanShakeButton] = useState(false);
     const [surrenderModalOpen, setSurrenderModalOpen] = useState(false);
+
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [serverErrorType, setServerErrorType] = useState("error");
+    const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
 
     // remove for production?
     const skippedFirstRenderOfDoubleRender = useRef(false);
@@ -77,21 +82,25 @@ const PlayerArea = ({
 
         return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
+
+    const triggerErrorModal = (errorType, errorMessage) => {
+        setServerErrorType(errorType);
+        setErrorModalOpen(true);
+        setCreateRoomErrorMsg(errorMessage);
+    }
     
     const playerIsReady = () => {
         setIsPlayerReady(true);
         
         socket.timeout(3000).emit("player is ready", {roomName: currentRoom[0]}, (err, res) => {
             if (err) {
-                console.log('fatal error');
+                triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
             } else {
-                // TODO: finish this
                 switch(res.status) {
                     case "ok":
-                        
                         break;
                     case "error":
-                        console.log('error');
+                        triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                         break;
                     case "warning":
                         break;
@@ -107,15 +116,13 @@ const PlayerArea = ({
         if (isInOnlineBattle) {
             socket.timeout(3000).emit("opponent has surrendered", {roomName: currentRoom[0]}, (err, res) => {
                 if (err) {
-                    console.log('fatal error');
+                    triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
                 } else {
-                    // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            
                             break;
                         case "error":
-                            console.log('error');
+                            triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                             break;
                         case "warning":
                             break;
@@ -210,6 +217,13 @@ const PlayerArea = ({
                 theYesFunction={surrenderOnlineMatch}
                 theNoFunction={() => setSurrenderModalOpen(false)}
             />
+
+            <ErrorModal
+                modalIsOpen={errorModalOpen}
+                onCloseModalFn={() => setErrorModalOpen(false)}
+                errorType={serverErrorType}
+                errorMsg={createRoomErrorMsg}
+            />
         </>
     )
 }
@@ -266,7 +280,6 @@ const ReadyButton = styled(GenericButton)`
         border-bottom: 4px solid #045ba8;
     }
 
-    // TODO: double check for 768px bug
     @media only screen and (max-height: 768px) {
         margin-top: 25px;
     }

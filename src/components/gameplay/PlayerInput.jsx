@@ -16,6 +16,7 @@ import WordInputErrors from "../errors/WordInputErrors";
 import { formattedEnglishDictionary } from "../../../english_dictionary";
 import styled, {css} from "styled-components";
 import WordLengthTrackingBar from "../misc/WordLengthTrackingBar";
+import ErrorModal from "../modals/ErrorModal";
 
 const PlayerInput = ({
     playerRole,
@@ -36,6 +37,10 @@ const PlayerInput = ({
 
     const [inputVal, setInputVal] = useState("");
     const [inputError, setInputError] = useState(false);
+
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [serverErrorType, setServerErrorType] = useState("error");
+    const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
 
     const inputRef = useRef();
     // remove for production?
@@ -85,6 +90,12 @@ const PlayerInput = ({
             });
         }
     }, [playerObj.hitPoints, oppositePlayer.hitPoints]);
+
+    const triggerErrorModal = (errorType, errorMessage) => {
+        setServerErrorType(errorType);
+        setErrorModalOpen(true);
+        setCreateRoomErrorMsg(errorMessage);
+    }
 
     const invokeBattle = (
         attackerArrowKey,
@@ -145,15 +156,13 @@ const PlayerInput = ({
             },
             (err, res) => {
                 if (err) {
-                    console.log('fatal error');
+                    triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
                 } else {
-                    // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            
                             break;
                         case "error":
-                            console.log('error');
+                            triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                             break;
                         case "warning":
                             break;
@@ -178,15 +187,13 @@ const PlayerInput = ({
         if (playerStatus === "defending") {
             socket.timeout(3000).emit("clear old attacking word", {attacked_input_id, roomName: currentRoom[0]}, (err, res) => {
                 if (err) {
-                    console.log('fatal error');
+                    triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
                 } else {
-                    // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            
                             break;
                         case "error":
-                            console.log('error');
+                            triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                             break;
                         case "warning":
                             break;
@@ -262,15 +269,13 @@ const PlayerInput = ({
         if (isInOnlineBattle) {
             socket.timeout(3000).emit("send typing words to opponent", {inputVal, inputInstanceNumber, roomName: currentRoom[0]}, (err, res) => {
                 if (err) {
-                    console.log('fatal error');
+                    triggerErrorModal("error", "The server seems to be down. Please try again in a moment.");
                 } else {
-                    // TODO: finish this
                     switch(res.status) {
                         case "ok":
-                            
                             break;
                         case "error":
-                            console.log('error');
+                            triggerErrorModal("error", "The server couldn't process the action. Please try again in a moment.");
                             break;
                         case "warning":
                             break;
@@ -423,6 +428,13 @@ const PlayerInput = ({
                     />
                 </div>
             </InputWrapper>
+
+            <ErrorModal
+                modalIsOpen={errorModalOpen}
+                onCloseModalFn={() => setErrorModalOpen(false)}
+                errorType={serverErrorType}
+                errorMsg={createRoomErrorMsg}
+            />
         </>
     )
 }
