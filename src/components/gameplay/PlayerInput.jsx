@@ -222,7 +222,7 @@ const PlayerInput = ({
                     end={`playerOne_word_attack_input_${attacked_input_id}`}
                     labels={{
                         end: <div
-                                id={`${playerRole}_active_arrow_timer_${inputInstanceNumber}`}
+                                id={`playerTwo_active_arrow_timer_${inputInstanceNumber}`}
                                 style={{
                                     border: "2px solid lightgrey",
                                     padding: "5px 12px",
