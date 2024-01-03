@@ -290,8 +290,8 @@ const Rooms = () => {
                     }}
                 >
                     <option value="english">English</option>
-                    <option value="french">French</option>
-                    <option value="spanish">Spanish</option>
+                    <option value="french">Français</option>
+                    <option value="spanish">Español</option>
                 </PlayingLanguage>
 
                 <CreateRoomButtonInModal

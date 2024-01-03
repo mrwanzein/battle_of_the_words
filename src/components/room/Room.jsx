@@ -111,7 +111,7 @@ const Room = ({
                 <RoomParamText>Input amount <RoomParamSpan>{roomParams.inputAmount}</RoomParamSpan></RoomParamText>
                 <RoomParamText>Max health <RoomParamSpan>{roomParams.maxHealth} HP</RoomParamSpan></RoomParamText>
                 <RoomParamText>Word expiration time <RoomParamSpan>{roomParams.wordExpireTime}s</RoomParamSpan></RoomParamText>
-                <RoomParamText>Language <RoomParamSpan>{roomParams.language[0].toUpperCase() + roomParams.language.slice(1)}</RoomParamSpan></RoomParamText>
+                <RoomParamText>Language <RoomParamSpan>{{english: "english", french: "Français", spanish: "Español"}[roomParams.language]}</RoomParamSpan></RoomParamText>
             </GenericModal>
         </RoomWrapper>
     )
