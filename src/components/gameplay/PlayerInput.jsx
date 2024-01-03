@@ -13,7 +13,7 @@ import { useXarrow } from "react-xarrows";
 import { socket } from "../../services/socket";
 import Xarrow from "react-xarrows"
 import WordInputErrors from "../errors/WordInputErrors";
-import { formattedEnglishDictionary } from "../../../english_dictionary";
+import { formattedEnglishDictionary, formattedFrenchDictionary, formattedSpanishDictionary } from "../../../language_dictionaries";
 import styled, {css} from "styled-components";
 import WordLengthTrackingBar from "../misc/WordLengthTrackingBar";
 import ErrorModal from "../modals/ErrorModal";
@@ -30,6 +30,7 @@ const PlayerInput = ({
     const oppositePlayer = useSelector(state => state.gameState[`${playerRole === "playerOne" ? "playerTwo" : "playerOne"}`]);
     const currentRoom = useSelector(state => state.roomState.currentRoom);
     const wordExpireTime = useSelector(state => state.gameState.wordExpireTime);
+    const playingLanguage = useSelector(state => state.gameState.language);
     const currentInputObj = playerObj.inputControls[`input_${inputInstanceNumber}`];
     
     const dispatch = useDispatch();
@@ -303,6 +304,8 @@ const PlayerInput = ({
         const wordAlreadyExists = usedWordsForBothPlayers.hasOwnProperty(word) || playerObj.usedWords.hasOwnProperty(word);
         const inputAlreadyHaveError = inputError;
         const inEnglishDictionary = formattedEnglishDictionary[word];
+        const inFrenchDictionary = formattedFrenchDictionary[word];
+        const inSpanishDictionary = formattedSpanishDictionary[word];
         const targetIsAlreadyActive = oppositePlayer.inputControls[`input_${playerObj.currentTarget}`]?.active;
         const wordToDefend = currentInputObj.wordToDefend;
 
@@ -325,10 +328,28 @@ const PlayerInput = ({
             setInputError("this word exists already");
             return true;
         }
-
-        if (!inEnglishDictionary) {
-            setInputError("this is not an English word");
-            return true;
+        
+        switch(playingLanguage) {
+            case "english":
+                if (!inEnglishDictionary) {
+                    setInputError("this is not an English word");
+                    return true;
+                }
+                break;
+            
+            case "french":
+                if (!inFrenchDictionary) {
+                    setInputError("this is not a French word");
+                    return true;
+                }
+                break;
+            
+            case "spanish":
+                if (!inSpanishDictionary) {
+                    setInputError("this is not a Spanish word");
+                    return true;
+                }
+                break;
         }
 
         if (!playerObj.currentTarget && !playerObj.inputControls[`input_${inputInstanceNumber}`].targetIfDefending) {

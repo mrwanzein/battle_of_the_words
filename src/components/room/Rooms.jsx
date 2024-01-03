@@ -9,7 +9,8 @@ import {
     setIsInOnlineBattle,
     setAmountOfInput,
     setMaxHealth,
-    setWordExpireTime
+    setWordExpireTime,
+    setPlayingLanguage
 } from "../../redux/features/game/gameSlice";
 import ErrorModal from "../modals/ErrorModal";
 import GenericModal from "../modals/GenericModal";
@@ -26,7 +27,8 @@ const Rooms = () => {
         roomName: "",
         inputAmount: 3,
         maxHealth: 50,
-        wordExpireTime: 15
+        wordExpireTime: 15,
+        language: "english"
     });
     const [roomNameInputError, setRoomNameInputError] = useState(false);
     const [searchRoomNameInput, setSearchRoomNameInput] = useState("");
@@ -107,7 +109,8 @@ const Rooms = () => {
             roomName: "",
             inputAmount: 3,
             maxHealth: 50,
-            wordExpireTime: 15
+            wordExpireTime: 15,
+            language: "english"
         });
         setRoomNameInputError(false);
     }
@@ -272,6 +275,25 @@ const Rooms = () => {
                     }}
                 />
 
+                <LanguageLabel htmlFor="PlayingLanguage">Language</LanguageLabel>
+                <PlayingLanguage
+                    id="PlayingLanguage"
+                    name="PlayingLanguage"
+                    onChange={e => {
+                        const languageVal = e.target.value;
+
+                        dispatch(setPlayingLanguage(languageVal));
+                        setRoomParams(state => ({
+                            ...state,
+                            language: languageVal
+                        }));
+                    }}
+                >
+                    <option value="english">English</option>
+                    <option value="french">French</option>
+                    <option value="spanish">Spanish</option>
+                </PlayingLanguage>
+
                 <CreateRoomButtonInModal
                     onClick={createRoom}
                     disabled={roomParams.roomName.length === 0 || roomNameInputError || whileCreatingRoom}
@@ -388,4 +410,14 @@ const WordExpireTimeAmount = styled.input`
 
 const WordExpireTimeAmountDisplay = styled.span`
     float: right;
+`
+
+const LanguageLabel = styled.label`
+    margin-top: 20px;
+`
+
+const PlayingLanguage = styled.select`
+    padding: 5px;
+    margin: 15px 0;
+    border: 2px solid black;
 `

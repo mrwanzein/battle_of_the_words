@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on("create a battle room", async ({roomName, inputAmount, maxHealth, wordExpireTime}, callback) => {
+    socket.on("create a battle room", async ({roomName, inputAmount, maxHealth, wordExpireTime, language}, callback) => {
         try {
             await socket.join(roomName);
             
@@ -53,7 +53,7 @@ io.on('connection', (socket) => {
                     id: generateRoomId(),
                     participants: [socket.id],
                     [socket.id]: {isReady: false, rematch: false},
-                    roomParams: {inputAmount, maxHealth, wordExpireTime}
+                    roomParams: {inputAmount, maxHealth, wordExpireTime, language}
                 }
             } else {
                 throw new Error("room already exists");

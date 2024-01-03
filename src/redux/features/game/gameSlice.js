@@ -13,6 +13,7 @@ const initialInputObj = {
 const initialState = {
     battleCounter: 3,
     isInOnlineBattle: false,
+    language: "english",
     amountOfInput: 3,
     wordExpireTime: 15,
     playerOne: {
@@ -57,6 +58,7 @@ export const gameSlice = createSlice({
             return {
                 ...initialState,
                 isInOnlineBattle: isStillInMatch,
+                language: isStillInMatch ? state.language : initialState.language,
                 amountOfInput: isStillInMatch ? state.amountOfInput : initialState.amountOfInput,
                 wordExpireTime: isStillInMatch ? state.wordExpireTime : initialState.wordExpireTime,
                 playerOne: {
@@ -155,6 +157,9 @@ export const gameSlice = createSlice({
         },
         setWordExpireTime: (state, action) => {
             state.wordExpireTime = action.payload;
+        },
+        setPlayingLanguage: (state, action) => {
+            state.language = action.payload;
         }
     }
 })
@@ -172,7 +177,8 @@ export const {
     resetGameState,
     setAmountOfInput,
     setMaxHealth,
-    setWordExpireTime
+    setWordExpireTime,
+    setPlayingLanguage
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

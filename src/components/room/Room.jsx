@@ -8,7 +8,8 @@ import {
     setIsInOnlineBattle,
     setAmountOfInput,
     setMaxHealth,
-    setWordExpireTime
+    setWordExpireTime,
+    setPlayingLanguage
 } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
 import LoadingSpinner from "../misc/LoadingSpinner";
@@ -43,6 +44,7 @@ const Room = ({
                         dispatch(setAmountOfInput(joinedRoom[1].roomParams.inputAmount));
                         dispatch(setMaxHealth(joinedRoom[1].roomParams.maxHealth));
                         dispatch(setWordExpireTime(joinedRoom[1].roomParams.wordExpireTime));
+                        dispatch(setPlayingLanguage(joinedRoom[1].roomParams.language));
                         dispatch(setIsInOnlineBattle(true));
                         dispatch(updateRoomInfo(joinedRoom));
                         navigate(`/arena/${joinedRoom[1].id}`);
@@ -109,6 +111,7 @@ const Room = ({
                 <RoomParamText>Input amount <RoomParamSpan>{roomParams.inputAmount}</RoomParamSpan></RoomParamText>
                 <RoomParamText>Max health <RoomParamSpan>{roomParams.maxHealth} HP</RoomParamSpan></RoomParamText>
                 <RoomParamText>Word expiration time <RoomParamSpan>{roomParams.wordExpireTime}s</RoomParamSpan></RoomParamText>
+                <RoomParamText>Language <RoomParamSpan>{roomParams.language[0].toUpperCase() + roomParams.language.slice(1)}</RoomParamSpan></RoomParamText>
             </GenericModal>
         </RoomWrapper>
     )
