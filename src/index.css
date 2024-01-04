@@ -1,3 +1,18 @@
+@font-face {
+    font-family: sofachrome;
+    src: url('./assets/fonts/sofachrome_rg.otf');
+}
+
+@font-face {
+    font-family: rexlia;
+    src: url('./assets/fonts/rexlia_rg.otf');
+}
+
+@font-face {
+    font-family: wheaton;
+    src: url('./assets/fonts/wheaton_capitals.otf');
+}
+
 html {
     font-family: Arial, Helvetica, sans-serif;
 }

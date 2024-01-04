@@ -318,6 +318,7 @@ export default Rooms;
 
 const CreateRoomButton = styled(GenericButton)`
     margin: 25px 30px;
+    font-family: rexlia;
 `
 
 const AboveRoomsWrapper = styled.div`

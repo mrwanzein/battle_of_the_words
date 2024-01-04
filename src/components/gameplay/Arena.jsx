@@ -249,6 +249,7 @@ const LeaveRoomButton = styled(GenericButton)`
     background: red;
     padding-bottom: 10px;
     align-self: center;
+    font-family: rexlia;
 
     &:active {
         border-bottom: 1px solid lightgrey;
@@ -271,6 +272,7 @@ const WinnerSign = styled.div`
 const WinnerText = styled.span`
     text-wrap: nowrap;
     font-size: 2em;
+    font-family: wheaton;
 `
 
 const CrownIcon = styled.span`

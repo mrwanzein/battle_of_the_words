@@ -143,7 +143,7 @@ const PlayerInput = ({
                 
                 setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
                 
-                dispatch(decrementHitPoints({player: defender, amount: inputtedWord.length}));
+                if (playerObj.hitPoints > 0 && oppositePlayer.hitPoints > 0) dispatch(decrementHitPoints({player: defender, amount: inputtedWord.length}));
                 dispatch(endInputDuel({attacker: playerRole, attacker_input_id: inputInstanceNumber, attacked_input_id}));
             }
         }, 1000);
@@ -262,7 +262,7 @@ const PlayerInput = ({
 
                 setActiveArrows(prev => prev.filter(arrow => arrow.key !== attackerArrowKey));
 
-                dispatch(decrementHitPoints({player: "playerOne", amount: inputtedWord.length}));
+                if (playerObj.hitPoints > 0 && oppositePlayer.hitPoints > 0) dispatch(decrementHitPoints({player: "playerOne", amount: inputtedWord.length}));
                 dispatch(endInputDuel({attacker: "playerTwo", attacker_input_id: inputInstanceFromServer, attacked_input_id}));
             }
         }, 1000);
@@ -480,6 +480,7 @@ const StyledInput = styled.input`
     padding: 10px;
     width: 300px;
     border: 1px solid black;
+    border-radius: 5px;
     cursor: ${({$playerTwoOnline}) => $playerTwoOnline ? "crosshair" : "initial"};
     ${
         ({$targeted}) => $targeted && css`

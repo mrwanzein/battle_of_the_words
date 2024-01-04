@@ -37,7 +37,7 @@ const WordsAreaWrapper = styled.div`
 
 const Title = styled.div`
     margin-top: 20px;
-    text-decoration: underline;
     font-size: 1.5em;
     text-align: center;
+    font-family: sofachrome
 `

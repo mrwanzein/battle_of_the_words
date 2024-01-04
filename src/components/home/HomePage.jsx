@@ -11,7 +11,8 @@ const HomePage = () => {
                         <NavLink
                             to="/"
                             style={({isActive}) => ({
-                                borderBottom: isActive ? "2px solid black" : "unset"
+                                borderBottom: isActive ? "2px solid black" : "unset",
+                                fontFamily: "wheaton"
                             })}
                         >
                             HOME
@@ -28,7 +29,8 @@ const HomePage = () => {
                         <NavLink
                             to="tutorial"
                             style={({isActive}) => ({
-                                borderBottom: isActive ? "2px solid black" : "unset"
+                                borderBottom: isActive ? "2px solid black" : "unset",
+                                fontFamily: "wheaton"
                             })}
                         >
                             TUTORIAL
@@ -40,7 +42,8 @@ const HomePage = () => {
                         <NavLink
                             to="rooms"
                             style={({isActive}) => ({
-                                borderBottom: isActive ? "2px solid black" : "unset"
+                                borderBottom: isActive ? "2px solid black" : "unset",
+                                fontFamily: "wheaton"
                             })}
                         >
                             ROOMS

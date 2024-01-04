@@ -93,7 +93,7 @@ const Room = ({
         <RoomWrapper>
             <RoomContentWrapper>
                 <HostAndOpponentWrapper>
-                    <RoomsName>{roomName}</RoomsName>
+                    <RoomsName>{roomName.toUpperCase()}</RoomsName>
                     <RoomInfoButton onClick={() => setRoomInfoModalOpen(true)}>Room info</RoomInfoButton>
                 </HostAndOpponentWrapper>
 
@@ -145,6 +145,7 @@ const JoinRoomButtonRoomsArea = styled(JoinRoomButtonGeneric)`
     margin: 10px;
     font-size: .8em;
     padding: 10px 25px;
+    font-family: rexlia;
 `
 
 const DeleteRoomButton = styled(JoinRoomButtonGeneric)`
@@ -156,6 +157,7 @@ const DeleteRoomButton = styled(JoinRoomButtonGeneric)`
 
 const RoomsName = styled.span`
     margin: 0 15px;
+    font-family: wheaton;
 `
 
 const PeopleInRoom = styled.span`

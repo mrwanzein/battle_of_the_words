@@ -6,7 +6,7 @@ import { setIsReadyForOnlineBattle, decrementHitPoints, resetGameState } from ".
 import { calculatePercentage } from "../../utils";
 import { updateRoomInfo } from "../../redux/features/rooms/roomSlice";
 import toast from 'react-hot-toast';
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import UsedWordsTracker from "./UsedWordsTracker";
 import PlayerInput from "./PlayerInput";
 import PlayerHpBar from "./PlayerHpBar";
@@ -140,6 +140,7 @@ const PlayerArea = ({
             <Wrapper
                 $playerHp={playerObj.hitPoints}
                 $oppositePlayerHp={oppositePlayer.hitPoints}
+                $playerRole={playerRole}
             >
                 {
                     !bothPlayerReady && isInOnlineBattle && playerRole === "playerOne" ?
@@ -235,7 +236,20 @@ const Wrapper = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin: 0 ${({$playerHp, $oppositePlayerHp}) => $playerHp <= 0 || $oppositePlayerHp <= 0 ? 150 : 200}px; 
+    margin: 40px ${({$playerHp, $oppositePlayerHp}) => $playerHp <= 0 || $oppositePlayerHp <= 0 ? 150 : 200}px;
+    border: 4px solid #3a3a3a37;;
+    padding: 15px 30px;
+    border-radius: 6px;
+    background: #e0e0e014;
+    box-shadow: ${({$playerRole}) => $playerRole === "playerOne" ? "-15px 15px 30px #bebebe, -15px -15px 30px #ffffff" : "15px 15px 30px #bebebe, -15px -15px 30px #ffffff"};
+    ${
+        ({$playerRole}) => $playerRole === "playerOne" ? css`
+            border-right: none;
+        ` :
+        css`
+            border-left: none;
+        `
+    }
 `
 
 const HpBarWrapper = styled.div`
@@ -292,6 +306,7 @@ const ForfeitButton = styled(GenericButton)`
     font-size: 1.3em;
     padding-bottom: 14px;
     visibility: ${({$playerRole}) => $playerRole === "playerTwo" ? "hidden" : "visible"};
+    font-family: rexlia;
     
     &:hover {
         background: #d60a0a;
