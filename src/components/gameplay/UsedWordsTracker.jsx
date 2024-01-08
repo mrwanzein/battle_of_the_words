@@ -33,6 +33,7 @@ const WordsAreaWrapper = styled.div`
     height: 200px;
     overflow-y: scroll;
     padding: 15px;
+    border: 1px solid #3a3a3a;
 `
 
 const Title = styled.div`

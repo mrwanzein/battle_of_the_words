@@ -37,6 +37,10 @@ const Wrapper = styled.div`
     line-height: 1.75;
     font-family: akasha;
     font-size: 1.6em;
+    
+    @media only screen and (max-height: 768px) {
+        font-size: 1.4em;
+    }
 `
 
 const CustomP = styled.p`

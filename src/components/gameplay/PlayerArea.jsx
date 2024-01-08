@@ -251,6 +251,10 @@ const Wrapper = styled.div`
             border-left: none;
         `
     }
+
+    @media only screen and (max-width: 1450px) {
+        margin: 0 140px;
+    }
 `
 
 const HpBarWrapper = styled.div`
