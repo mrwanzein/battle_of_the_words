@@ -5,7 +5,7 @@ const Home = () => {
     return (
         <Wrapper>
             <CustomP>
-                Hi, I'm Mrwan Zein and this is battle of the words. It's a free word game that I created after being inspired by <a href="https://shiritorigame.com/" target="_blank" rel="noopener noreferrer">Shiritori game</a>. 
+                Hi, I'm Mrwan Zein and this is Battle of the words. It's a free word game that I created after being inspired by <a href="https://shiritorigame.com/" target="_blank" rel="noopener noreferrer">Shiritori game</a>. 
                 I found that version of the game to be too unidimensional, so I added my own flavor by making it more dynamic. The game doesn't support playing against
                 the computer for now, but it will be a feature in the future.
             </CustomP>
