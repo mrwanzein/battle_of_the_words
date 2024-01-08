@@ -13,8 +13,22 @@
     src: url('./assets/fonts/wheaton_capitals.otf');
 }
 
+@font-face {
+    font-family: akasha;
+    src: url('./assets/fonts/AkashaRegular-Rprn6.ttf');
+}
+
+@font-face {
+    font-family: assasinNinja;
+    src: url('./assets/fonts/AssassinNinja-w12j8.otf');
+}
+
 html {
     font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #e8f2ff;
 }
 
 html, body, #root {

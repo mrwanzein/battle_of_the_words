@@ -15,7 +15,7 @@ export default PlayerHpBar;
 const ParentWrapper = styled.div`
     display: flex;
     align-items: flex-end;
-    margin-top: 17%;
+    margin-top: 16.5%;
     border: 2.5px solid black;
     width: 15px;
     ${({$onTheRight}) => $onTheRight ? css`margin-left: 30px;` : css`margin-right: 30px;`}

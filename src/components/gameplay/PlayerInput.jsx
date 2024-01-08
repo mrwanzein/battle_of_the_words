@@ -23,7 +23,8 @@ const PlayerInput = ({
     playerObj,
     inputInstanceNumber,
     setActiveArrows,
-    activeArrows
+    activeArrows,
+    lastInstance
 }) => {
     const isInOnlineBattle = useSelector(state => state.gameState.isInOnlineBattle);
     const usedWordsForBothPlayers = useSelector(state => state.gameState.usedWordsForBothPlayer);
@@ -376,86 +377,83 @@ const PlayerInput = ({
             {
                 inputError ? <WordInputErrors errorMsg={inputError}/> : null
             }
+            
+            {
+                currentInputObj.active &&
+                currentInputObj.status === "attacking" ?
+                <WordHUDWrapper>
+                    <span>{currentInputObj.attackingWord}</span>
+                    <span>{currentInputObj.attackingWord.length}</span>
+                </WordHUDWrapper> : null
+            }
 
-            <InputWrapper>
-                <div>
-                    {
-                        currentInputObj.active &&
-                        currentInputObj.status === "attacking" ?
-                        <WordHUDWrapper>
-                            <span>{currentInputObj.attackingWord}</span>
-                            <span>{currentInputObj.attackingWord.length}</span>
-                        </WordHUDWrapper> : null
-                    }
-
-                    {
-                        currentInputObj.status === "defending" &&
-                        <WordHUDWrapper>
-                            <WordLengthTrackingBar
-                                trackingPercentage={calculatePercentage(inputVal.length, currentInputObj.wordToDefend.length)}
-                            />
-                            <TrackingBarNumericalFeedBack>{inputVal.length >= currentInputObj.wordToDefend.length ? "👍" : inputVal.length}</TrackingBarNumericalFeedBack>
-                        </WordHUDWrapper>
-                    }
-                    
-                    <StyledInput
-                        $targeted={playerObj.opponentsTarget === inputInstanceNumber && playerRole === "playerTwo"}
-                        $playerTwoOnline={isInOnlineBattle && playerRole === "playerTwo"}
-                        ref={inputRef}
-                        type="text"
-                        id={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
-                        value={inputVal}
-                        onChange={showToOpponentTypingWords}
-                        onClick={targetInputWithClick}
-                        placeholder={
-                            currentInputObj.active &&
-                            currentInputObj.status === "defending" &&
-                            currentInputObj.wordToDefend ?
-                            currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
-                        }
-                        readOnly={currentInputObj.active && currentInputObj.status === "attacking" || isInOnlineBattle && playerRole === "playerTwo"}
-                        onKeyDown={e => {
-                            if (e.code === "Enter" && playerRole === "playerOne") {
-                                const inputtedWord = e.target.value;
-                                const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
-                                const playerStatus = currentInputObj.status;
-                                const attacked_input_id = playerStatus === "defending" ?
-                                    playerObj.inputControls[`input_${inputInstanceNumber}`].targetIfDefending :
-                                    playerObj.currentTarget;
-                                const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
-                                const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
-
-                                if (!checkInputErrors(inputtedWord, playerStatus)) {
-                                    dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
-                                    setInputVal("");
-                                    
-                                    if (playerStatus === "defending") {
-                                        clearInterval(currentInputObj.arrowToDefendTimerId);
-                                        setActiveArrows(prev => prev.filter(arrow => arrow.key !== defenderArrowKey));
-                                        
-                                        invokeBattle(
-                                            attackerArrowKey,
-                                            defender,
-                                            attacked_input_id,
-                                            inputtedWord,
-                                            playerStatus
-                                        );
-                                    }
-
-                                    if (playerStatus === "attacking") {
-                                        invokeBattle(
-                                            attackerArrowKey,
-                                            defender,
-                                            attacked_input_id,
-                                            inputtedWord
-                                        );
-                                    }
-                                }
-                            }
-                        }}
+            {
+                currentInputObj.status === "defending" &&
+                <WordHUDWrapper>
+                    <WordLengthTrackingBar
+                        trackingPercentage={calculatePercentage(inputVal.length, currentInputObj.wordToDefend.length)}
                     />
-                </div>
-            </InputWrapper>
+                    <TrackingBarNumericalFeedBack>{inputVal.length >= currentInputObj.wordToDefend.length ? "👍" : inputVal.length}</TrackingBarNumericalFeedBack>
+                </WordHUDWrapper>
+            }
+            
+            <StyledInput
+                $targeted={playerObj.opponentsTarget === inputInstanceNumber && playerRole === "playerTwo"}
+                $playerTwoOnline={isInOnlineBattle && playerRole === "playerTwo"}
+                $lastInstance={lastInstance}
+                ref={inputRef}
+                type="text"
+                id={`${playerRole}_word_attack_input_${inputInstanceNumber}`}
+                value={inputVal}
+                onChange={showToOpponentTypingWords}
+                onClick={targetInputWithClick}
+                placeholder={
+                    currentInputObj.active &&
+                    currentInputObj.status === "defending" &&
+                    currentInputObj.wordToDefend ?
+                    currentInputObj.wordToDefend[currentInputObj.wordToDefend.length - 1] : null
+                }
+                readOnly={currentInputObj.active && currentInputObj.status === "attacking" || isInOnlineBattle && playerRole === "playerTwo"}
+                onKeyDown={e => {
+                    if (e.code === "Enter" && playerRole === "playerOne") {
+                        const inputtedWord = e.target.value;
+                        const defender = playerRole === "playerOne" ? "playerTwo" : "playerOne";
+                        const playerStatus = currentInputObj.status;
+                        const attacked_input_id = playerStatus === "defending" ?
+                            playerObj.inputControls[`input_${inputInstanceNumber}`].targetIfDefending :
+                            playerObj.currentTarget;
+                        const attackerArrowKey = `${playerRole}_word_attack_input_${inputInstanceNumber}_attacking_input_${attacked_input_id}`;
+                        const defenderArrowKey = `${defender}_word_attack_input_${attacked_input_id}_attacking_input_${inputInstanceNumber}`;
+
+                        if (!checkInputErrors(inputtedWord, playerStatus)) {
+                            dispatch(addWordToUsedWord({player: playerRole, word: inputtedWord}));
+                            setInputVal("");
+                            
+                            if (playerStatus === "defending") {
+                                clearInterval(currentInputObj.arrowToDefendTimerId);
+                                setActiveArrows(prev => prev.filter(arrow => arrow.key !== defenderArrowKey));
+                                
+                                invokeBattle(
+                                    attackerArrowKey,
+                                    defender,
+                                    attacked_input_id,
+                                    inputtedWord,
+                                    playerStatus
+                                );
+                            }
+
+                            if (playerStatus === "attacking") {
+                                invokeBattle(
+                                    attackerArrowKey,
+                                    defender,
+                                    attacked_input_id,
+                                    inputtedWord
+                                );
+                            }
+                        }
+                    }
+                }}
+            />
 
             <ErrorModal
                 modalIsOpen={errorModalOpen}
@@ -469,16 +467,11 @@ const PlayerInput = ({
 
 export default PlayerInput;
 
-const InputWrapper = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`
-
 const StyledInput = styled.input`
-    margin: 15px;
+    margin-bottom: ${({$lastInstance}) => $lastInstance ? "0" : "15px"};
+    margin-top: 15px;
     padding: 10px;
-    width: 300px;
+    width: 372px;
     border: 1px solid black;
     border-radius: 5px;
     cursor: ${({$playerTwoOnline}) => $playerTwoOnline ? "crosshair" : "initial"};
@@ -495,7 +488,7 @@ const WordHUDWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin: 0 15px;
+    width: 100%;
     margin-bottom: -10px;
 `
 

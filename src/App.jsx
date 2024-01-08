@@ -7,6 +7,7 @@ import Rooms from "./components/room/Rooms";
 import Navbar from "./components/navbar/Navbar";
 import PageNotFound from "./PageNotFound";
 import CustomToaster from "./components/misc/CustomToaster";
+import Footer from "./components/footer/Footer";
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
       </BrowserRouter>
 
       <CustomToaster />
+
+      <Footer />
     </>
   )
 }

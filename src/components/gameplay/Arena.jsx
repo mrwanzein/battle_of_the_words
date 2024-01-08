@@ -135,7 +135,7 @@ const Arena = () => {
     return (
         <Xwrapper>
             <Wrapper>
-                <LeaveRoomButton onClick={() => setConfirmLeavingMatchOpen(true)}>Leave room</LeaveRoomButton>
+                <LeaveRoomButton onClick={() => setConfirmLeavingMatchOpen(true)}>LEAVE ROOM</LeaveRoomButton>
 
                 {
                     (playerOne.hitPoints <= 0 || playerTwo.hitPoints <= 0) && canSeeRematchButton ?
@@ -221,6 +221,7 @@ const PlayerAreaWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 100px;
 `
 
 const RematchWrapper = styled.div`
@@ -250,6 +251,8 @@ const LeaveRoomButton = styled(GenericButton)`
     padding-bottom: 10px;
     align-self: center;
     font-family: rexlia;
+    font-size: 0.8em;
+    text-wrap: nowrap;
 
     &:active {
         border-bottom: 1px solid lightgrey;

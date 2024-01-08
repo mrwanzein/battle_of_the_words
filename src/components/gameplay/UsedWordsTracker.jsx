@@ -39,5 +39,6 @@ const Title = styled.div`
     margin-top: 20px;
     font-size: 1.5em;
     text-align: center;
-    font-family: sofachrome
+    font-family: sofachrome;
+    color: #3a3a3a;
 `

@@ -98,7 +98,7 @@ const Room = ({
                 </HostAndOpponentWrapper>
 
                 <ButtonsWrapperOnRoomInstance>
-                    <PeopleInRoom>{`${roomCount}/2`}</PeopleInRoom>
+                    <PeopleInRoom>{`${roomCount} / 2`}</PeopleInRoom>
                     {isOwner ? <DeleteRoomButton onClick={deleteRoom} disabled={whileDeletingRoom}>{whileDeletingRoom ? <LoadingSpinner /> : "DELETE"}</DeleteRoomButton> : null}
                     <JoinRoomButtonRoomsArea onClick={joinRoom} disabled={whileJoiningRoom || roomCount === 2}>{whileJoiningRoom ? <LoadingSpinner /> : "JOIN"}</JoinRoomButtonRoomsArea>
                 </ButtonsWrapperOnRoomInstance>

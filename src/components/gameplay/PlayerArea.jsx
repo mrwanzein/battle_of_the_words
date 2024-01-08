@@ -192,6 +192,7 @@ const PlayerArea = ({
                                         inputInstanceNumber={index + 1}
                                         setActiveArrows={setActiveArrows}
                                         activeArrows={activeArrows}
+                                        lastInstance={index + 1 === attackInputAmount}
                                     />
                                 )
                             }
@@ -208,7 +209,7 @@ const PlayerArea = ({
                     $playerRole={playerRole}
                     disabled={playerObj.hitPoints <= 0 || oppositePlayer.hitPoints <= 0 || battleCounter > 0}
                 >
-                    surrender &nbsp;&#128128;
+                    SURRENDER &nbsp;&#128128;
                 </ForfeitButton>
             </Wrapper>
 
@@ -236,11 +237,11 @@ const Wrapper = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin: 40px ${({$playerHp, $oppositePlayerHp}) => $playerHp <= 0 || $oppositePlayerHp <= 0 ? 150 : 200}px;
+    margin: 0 ${({$playerHp, $oppositePlayerHp}) => $playerHp <= 0 || $oppositePlayerHp <= 0 ? 150 : 200}px;
     border: 4px solid #3a3a3a37;;
     padding: 15px 30px;
     border-radius: 6px;
-    background: #e0e0e014;
+    background: white;
     box-shadow: ${({$playerRole}) => $playerRole === "playerOne" ? "-15px 15px 30px #bebebe, -15px -15px 30px #ffffff" : "15px 15px 30px #bebebe, -15px -15px 30px #ffffff"};
     ${
         ({$playerRole}) => $playerRole === "playerOne" ? css`
@@ -302,8 +303,8 @@ const ReadyButton = styled(GenericButton)`
 const ForfeitButton = styled(GenericButton)`
     background: red;
     width: 100%;
-    margin: 30px 0;
-    font-size: 1.3em;
+    margin-top: 40px;
+    font-size: 1.1em;
     padding-bottom: 14px;
     visibility: ${({$playerRole}) => $playerRole === "playerTwo" ? "hidden" : "visible"};
     font-family: rexlia;

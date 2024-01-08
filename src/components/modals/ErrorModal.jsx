@@ -55,6 +55,7 @@ const ErrorMessageWrapper = styled.div`
 `
 
 const ErrorMessageStyle = styled.span`
-    margin: 15px 5px;
+    margin: 15px 0px;
+    margin-right: 15px;
     color: ${({$errorType}) => ({error: "white", warning: "#555207"}[$errorType])};
 `

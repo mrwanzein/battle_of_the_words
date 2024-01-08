@@ -78,6 +78,7 @@ const HomePageArea = styled.div`
     width: 65%;
     border: 2px solid black;
     border-radius: 10px;
+    background: white;
 
     @media only screen and (max-height: 768px) {
         height: 85%;
@@ -90,6 +91,7 @@ const LinksWrapper = styled.div`
     justify-content: space-around;
     height: 70px;
     border-bottom: 2px solid black;
+    font-size: 1.1em;
 
     a {
         text-decoration: none;

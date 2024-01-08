@@ -4,24 +4,24 @@ const Tutorial = () => {
     return (
         <Wrapper>
             <div>
-                <h2>Goal of the game</h2>
-                <p>
+                <CustomHeaderH2>Goal of the game</CustomHeaderH2>
+                <CustomP>
                     The goal of the game is simple, bring the opponent's health to 0.
-                </p>
+                </CustomP>
             </div>
 
             <div>
-                <h2>How to play</h2>
+                <CustomHeaderH2>How to play</CustomHeaderH2>
                 
-                <p>
-                    As a word game in the style of <a href="https://en.wikipedia.org/wiki/Shiritori">shiritori</a> (a japanese word game), the main action is to
+                <CustomP>
+                    As a word game in the style of <a href="https://en.wikipedia.org/wiki/Shiritori" target="_blank" rel="noopener noreferrer">shiritori</a> (a japanese word game), the main action is to
                     attack your opponent by writing words in the inputs. The tricky part is the defending. The player has to use the
                     last letter of the opponent's word and the length of the word must be equal or higher than the attacking one.
-                </p>
+                </CustomP>
 
-                <p>Let's look at the image below. The numbers in the image will be explained under it.</p>
+                <CustomP>Let's look at the image below. The numbers in the image will be explained under it.</CustomP>
                 
-                <TutorialImg1 src="/src/assets/images/tutorialImg1.jpg" alt="image with numbers explaining how to play" />
+                <TutorialImg1 src="/src/assets/images/gameTutorial.jpg" alt="image with numbers explaining how to play" />
 
                 <ol>
                     <TutorialListInstance>
@@ -43,7 +43,7 @@ const Tutorial = () => {
                     </TutorialListInstance>
 
                     <TutorialListInstance>
-                        While defending, there is a feedback bar indicating if the defending word has enough length to defend. Once it's of the same length or higer,
+                        While defending, there is a feedback bar indicating if the defending word has enough length to defend. Once it's of the same length or higher,
                         the bar will turn fully green and a thumbs up will appear.
                     </TutorialListInstance>
 
@@ -69,6 +69,8 @@ const Wrapper = styled.div`
     flex: 1;
     padding: 0 15px;
     line-height: 1.75;
+    font-family: akasha;
+    font-size: 1.4em;
 `
 
 const TutorialImg1 = styled.img`
@@ -78,4 +80,12 @@ const TutorialImg1 = styled.img`
 
 const TutorialListInstance = styled.li`
     padding: 5px;
+`
+
+const CustomHeaderH2 = styled.h2`
+    margin: 10px 0 0 0;
+`
+
+const CustomP = styled.p`
+    margin: 0;
 `

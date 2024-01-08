@@ -89,7 +89,8 @@ const NavDiv = styled.div`
 `
 
 const GameName = styled.span`
-    font-size: 1.5em;
+    font-family: assasinNinja;
+    font-size: 1.8em;
     cursor: pointer;
     margin-left: 50px;
     color: white;
