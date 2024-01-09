@@ -294,6 +294,7 @@ const ReadyButton = styled(GenericButton)`
     animation-duration: .4s;
     animation-iteration-count: 5;
     animation-timing-function: linear;
+    font-family: wheaton;
 
     &:active {
         border-bottom: 4px solid #045ba8;
