@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import tutorialImg from "../../assets/images/gameTutorial.jpg";
 
 const Tutorial = () => {
     return (
@@ -21,7 +22,7 @@ const Tutorial = () => {
 
                 <CustomP>Let's look at the image below. The numbers in the image will be explained under it.</CustomP>
                 
-                <TutorialImg1 src="/src/assets/images/gameTutorial.jpg" alt="image with numbers explaining how to play" />
+                <TutorialImg1 src={tutorialImg} alt="image with numbers explaining how to play" />
 
                 <ol>
                     <TutorialListInstance>

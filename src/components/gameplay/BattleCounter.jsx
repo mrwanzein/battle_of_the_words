@@ -2,19 +2,20 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { decrementBattleCounter } from "../../redux/features/game/gameSlice";
 import styled from "styled-components";
+import countDownAudioSrc from "../../assets/sounds/3_2_1_go.wav";
 
 const BattleCounter = () => {
     const battleCounter = useSelector(state => state.gameState.battleCounter);
     const dispatch = useDispatch();
 
-    // remove for production?
-    const skippedFirstRenderOfDoubleRender = useRef(false);
+    // remove for production
+    // const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
         let innerCounter = 3;
         
-        if (skippedFirstRenderOfDoubleRender.current) {
-            const countDownAudio = new Audio("/src/assets/sounds/3_2_1_go.wav");
+        // if (skippedFirstRenderOfDoubleRender.current) {
+            const countDownAudio = new Audio(countDownAudioSrc);
             countDownAudio.play();
 
             const counterIntervalId = setInterval(() => {
@@ -25,9 +26,9 @@ const BattleCounter = () => {
                     clearInterval(counterIntervalId);
                 }
             }, 1000);
-        }
+        // }
 
-        return () => skippedFirstRenderOfDoubleRender.current = true;
+        // return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
     
     return (

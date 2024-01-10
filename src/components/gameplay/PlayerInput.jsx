@@ -13,7 +13,7 @@ import { useXarrow } from "react-xarrows";
 import { socket } from "../../services/socket";
 import Xarrow from "react-xarrows"
 import WordInputErrors from "../errors/WordInputErrors";
-import { formattedEnglishDictionary, formattedFrenchDictionary, formattedSpanishDictionary } from "../../../language_dictionaries";
+import { formattedEnglishDictionary, formattedFrenchDictionary, formattedSpanishDictionary } from "../../language_dictionaries";
 import styled, {css} from "styled-components";
 import WordLengthTrackingBar from "../misc/WordLengthTrackingBar";
 import ErrorModal from "../modals/ErrorModal";
@@ -45,11 +45,11 @@ const PlayerInput = ({
     const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
 
     const inputRef = useRef();
-    // remove for production?
-    const skippedFirstRenderOfDoubleRender = useRef(false);
+    // remove for production
+    // const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
-        if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
+        // if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
             socket.on("show typing words from opponent", ({inputVal, inputInstanceFromServer}) => {
                 if (playerRole === "playerTwo" && inputInstanceFromServer === inputInstanceNumber) {
                     setInputVal(inputVal);
@@ -74,9 +74,9 @@ const PlayerInput = ({
                     setInputVal("");
                 }
             });
-        }
+        // }
 
-        return () => skippedFirstRenderOfDoubleRender.current = true;
+        // return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
 
     useEffect(() => {

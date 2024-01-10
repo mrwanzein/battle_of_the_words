@@ -12,8 +12,9 @@ import PlayerInput from "./PlayerInput";
 import PlayerHpBar from "./PlayerHpBar";
 import SimpleYesNoModal from "../modals/SimpleYesNoModal";
 import ErrorModal from "../modals/ErrorModal";
+import getReadyAudioSrc from "../../assets/sounds/getReady.mp3";
 
-const getReady = new Audio("/src/assets/sounds/getReady.mp3");
+const getReady = new Audio(getReadyAudioSrc);
 
 const PlayerArea = ({
     playerObj,
@@ -39,11 +40,11 @@ const PlayerArea = ({
     const [serverErrorType, setServerErrorType] = useState("error");
     const [createRoomErrorMsg, setCreateRoomErrorMsg] = useState("");
 
-    // remove for production?
-    const skippedFirstRenderOfDoubleRender = useRef(false);
+    // remove for production
+    // const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
-        if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
+        // if (isInOnlineBattle && skippedFirstRenderOfDoubleRender.current) {
             socket.on("player is ready", () => {
                 if (playerRole === "playerTwo") {
                     dispatch(setIsReadyForOnlineBattle(true));
@@ -78,9 +79,9 @@ const PlayerArea = ({
                     setOpponentJoinedRoom(false);
                     setIsPlayerReady(false);
             });
-        }
+        // }
 
-        return () => skippedFirstRenderOfDoubleRender.current = true;
+        // return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
 
     const triggerErrorModal = (errorType, errorMessage) => {

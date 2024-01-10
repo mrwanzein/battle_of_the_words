@@ -33,8 +33,8 @@ const Arena = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    // remove for production?
-    const skippedFirstRenderOfDoubleRender = useRef(false);
+    // remove for production
+    // const skippedFirstRenderOfDoubleRender = useRef(false);
 
     useEffect(() => {
         const isInRoomThatExists = currentRoom && currentRoom[1].id === roomId;
@@ -43,7 +43,7 @@ const Arena = () => {
             navigate("/");
         }
 
-        if (skippedFirstRenderOfDoubleRender.current) {
+        // if (skippedFirstRenderOfDoubleRender.current) {
             socket.on("players are ready to battle online", () => {
                 setBothPlayerReady(true);
                 setCanSeeRematchButton(true);
@@ -64,9 +64,9 @@ const Arena = () => {
                 setBothPlayerReady(false);
                 setCanSeeRematchButton(false);
             });
-        }
+        // }
 
-        return () => skippedFirstRenderOfDoubleRender.current = true;
+        // return () => skippedFirstRenderOfDoubleRender.current = true;
     }, []);
 
     const triggerErrorModal = (errorType, errorMessage) => {
